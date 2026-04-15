@@ -3,3 +3,7 @@
 	email = evan.hanif.w@gmail.com
 [safe]
 	directory = *
+[credential]
+	helper = store
+[fetch]
+	prune = true

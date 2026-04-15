@@ -36,6 +36,8 @@ alias reload="source ~/.zshrc"
 alias lg="lazygit"
 alias fd="fdfind"
 alias y="yazi"
+alias ls="eza --icons"
+alias ll="eza -al --icons --group-directories-first"
 
 eval "$(zoxide init zsh --cmd cd)"
 eval "$(starship init zsh)"
