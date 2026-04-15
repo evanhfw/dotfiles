@@ -1,0 +1,6 @@
+.config/opencode/node_modules/**
+.config/opencode/skills/**
+.config/opencode/antigravity-accounts.json*
+.config/opencode/bun.lock
+.config/opencode/package-lock.json
+.config/opencode/opencode.json.bak

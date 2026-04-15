@@ -1,0 +1,42 @@
+# Core (Oh My Zsh)
+export ZSH="$HOME/.oh-my-zsh"
+ZSH_THEME=""   # kosongkan (tidak pakai theme)
+plugins=(
+  git
+  zsh-autosuggestions
+  zsh-syntax-highlighting
+)
+source $ZSH/oh-my-zsh.sh
+
+# History
+HISTSIZE=50000
+SAVEHIST=50000
+HISTFILE=~/.zsh_history
+setopt HIST_IGNORE_ALL_DUPS
+setopt HIST_IGNORE_SPACE
+setopt SHARE_HISTORY
+
+# Editor
+export EDITOR=nvim
+export VISUAL=nvim
+
+# Path
+export PATH="$HOME/.local/bin:$PATH"
+export PATH="/usr/local/go/bin:$PATH"
+export PATH="$HOME/go/bin:$PATH"
+export PATH="$HOME/.bun/bin:$PATH"
+export PATH="$HOME/.opencode/bin:$PATH"
+export PATH="$HOME/bin:$PATH"
+
+alias ..="cd .."
+alias ...="cd ../.."
+alias df="df -h"
+alias zshrc="nvim ~/.zshrc"
+alias reload="source ~/.zshrc"
+alias lg="lazygit"
+alias fd="fdfind"
+alias y="yazi"
+
+eval "$(zoxide init zsh --cmd cd)"
+eval "$(starship init zsh)"
+
