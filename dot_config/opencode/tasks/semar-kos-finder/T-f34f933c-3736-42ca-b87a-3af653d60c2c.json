@@ -1,0 +1,10 @@
+{
+  "id": "T-f34f933c-3736-42ca-b87a-3af653d60c2c",
+  "subject": "Implement harga variants UI (price range + compact cards)",
+  "description": "New price section UI: (1) Price range header showing min-max, (2) Highlighted \"best value\" variant with star, (3) Compact variant cards showing price + deskripsi + exclude note",
+  "status": "pending",
+  "activeForm": "Implementing price variant UI",
+  "blocks": [],
+  "blockedBy": [],
+  "threadID": "ses_284857c6fffeq0waCHaytOWTFJ"
+}

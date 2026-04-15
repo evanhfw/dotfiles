@@ -1,0 +1,11 @@
+{
+  "id": "T-3a4f399f-3468-4c6d-8475-8e8108ce54fa",
+  "subject": "Add Apple-style nav to layout.tsx",
+  "description": "Implement sticky glass navigation bar and update global typography/background to Apple design system in frontend/app/layout.tsx.",
+  "status": "completed",
+  "activeForm": "Finished adding Apple-style nav to layout.tsx",
+  "blocks": [],
+  "blockedBy": [],
+  "parentID": "T-12a1a137-96f3-44bb-a8e9-b70371474d5f",
+  "threadID": "ses_28493140dffecddVCreykqos9X"
+}

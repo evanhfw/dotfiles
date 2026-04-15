@@ -1,0 +1,10 @@
+{
+  "id": "T-9473f032-bda0-4b63-b848-bb6eceb1b09d",
+  "subject": "Update logging to show Vehicle ID (Ori) and Draw ID",
+  "description": "Update all vehicle-related logging statements in _detect_dumping_kritis_v4.py to show both original vehicle ID and display ID (draw_id) which is calculated as id % modulo. This includes blocking, violation, area entry/exit, and out-of-frame logs.",
+  "status": "completed",
+  "activeForm": "Updating logging statements to show both Vehicle ID (Ori) and Draw ID",
+  "blocks": [],
+  "blockedBy": [],
+  "threadID": "ses_274a17b1dffeBhg0JxjGhE6K2G"
+}

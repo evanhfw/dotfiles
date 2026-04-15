@@ -1,0 +1,10 @@
+{
+  "id": "T-dafd49b6-5fb0-40d3-a966-20f525b98460",
+  "subject": "Rework UI to Apple design system per DESIGN.md",
+  "description": "Transform the semar-kos-finder UI from current sage/steel/peach palette to Apple design system. Key changes:\n1. layout.tsx: Add Apple-style translucent glass nav bar (48px, rgba(0,0,0,0.8) + backdrop-filter blur)\n2. Map.tsx popup: Restyle to Apple aesthetic - #f5f5f7 background, dark text, Apple Blue (#0071e3) interactive elements only\n3. Typography: Use SF Pro Display/Text with proper optical sizing, negative letter-spacing\n4. Buttons: Primary CTA in #0071e3, pill links with 980px radius\n5. Cards: Subtle shadows, no borders, 8px radius\n6. Badge colors: Use dark surfaces (#272729 etc) not colored pastels\n7. Body background: #f5f5f7",
+  "status": "completed",
+  "activeForm": "Reworking UI to Apple design system",
+  "blocks": [],
+  "blockedBy": [],
+  "threadID": "ses_284944da4ffec3qs3bac8Hmrbw"
+}

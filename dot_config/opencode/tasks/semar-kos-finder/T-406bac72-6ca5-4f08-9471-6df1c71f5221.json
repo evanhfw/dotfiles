@@ -1,0 +1,11 @@
+{
+  "id": "T-406bac72-6ca5-4f08-9471-6df1c71f5221",
+  "subject": "Restyle Map popup and controls to Apple DS",
+  "description": "Update Map.tsx popup, badges, buttons, and route UI to match Apple-inspired design system while preserving functionality.",
+  "status": "completed",
+  "activeForm": "Finished restyling Map.tsx popup and controls",
+  "blocks": [],
+  "blockedBy": [],
+  "parentID": "T-12a1a137-96f3-44bb-a8e9-b70371474d5f",
+  "threadID": "ses_28493140dffecddVCreykqos9X"
+}

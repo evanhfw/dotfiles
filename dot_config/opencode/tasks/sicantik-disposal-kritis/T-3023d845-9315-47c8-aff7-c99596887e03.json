@@ -1,0 +1,9 @@
+{
+  "id": "T-3023d845-9315-47c8-aff7-c99596887e03",
+  "subject": "Implement Draw Inference Analytics Changes",
+  "description": "Per ticket-inference-analytics.md:\n1. Format label bbox atas: {ID}-{ClassName} ({ConfInt%})\n2. Format label bbox bawah (Truck HD only): {seconds} second ({area}%)\n3. Clamp ID to 2 digits (0-99)\n4. Reduce font size, ensure text ≤ bbox width\n5. CK: move Total Monitor/Violation to bottom, 75% font, no gap\n6. Number formatting: trim trailing zeros",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": [],
+  "threadID": "ses_2769b41d2ffeZhY2ZvYaA8dJ0P"
+}

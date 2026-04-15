@@ -1,0 +1,9 @@
+{
+  "id": "T-93a74728-d41e-4e6c-9217-92fe0422e9c2",
+  "subject": "Create register_from_folder.py script",
+  "description": "Create a Python script that:\n1. Scans a folder (e.g., BMT02-Siang/) containing person subfolders with .jpg images\n2. Extracts face embeddings using DeepFace (Facenet512)\n3. Inserts each image as a row into sicantik_uface_face_embeddings_facenet_cctv MySQL table\n4. Has CLI args for --mitra, --max-images, --table-name, --dry-run, --skip-db\n5. DB connection via env vars (DB_HOST, DB_PORT, DB_USER, DB_PASS, DB_NAME)\n6. Proper logging and summary output",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": [],
+  "threadID": "ses_27b5f1254ffeTEQRE3R6MOELkA"
+}

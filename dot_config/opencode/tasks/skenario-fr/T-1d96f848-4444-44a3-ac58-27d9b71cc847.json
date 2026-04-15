@@ -1,0 +1,9 @@
+{
+  "id": "T-1d96f848-4444-44a3-ac58-27d9b71cc847",
+  "subject": "Add skip_db_insert + batch_size to registration pipeline",
+  "description": "1. register_employee_to_db.py: Add skip_db_insert param, return row_data template for batch insert\n2. register_from_folder.py: Add --batch-size, implement Phase 1 (compute parallel) + Phase 2 (batch insert every N)\n3. CSV details must remain accurate",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": [],
+  "threadID": "ses_279b6fa24fferTbcklCysIh6Y3"
+}

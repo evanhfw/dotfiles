@@ -1,0 +1,10 @@
+{
+  "id": "T-86a03d08-6c8a-4096-adb5-c795472b19c0",
+  "subject": "Implement grouped fasilitas pills",
+  "description": "Group fasilitas into categories: Kamar (Kasur, Lemari, Meja belajar), KM (Kamar mandi dalam, luar), AC (AC, Kulkas), Umum (Listrik, Air, Dapur, WIFI). Render as styled pills with category grouping.",
+  "status": "pending",
+  "activeForm": "Implementing grouped fasilitas pills",
+  "blocks": [],
+  "blockedBy": [],
+  "threadID": "ses_284857c6fffeq0waCHaytOWTFJ"
+}

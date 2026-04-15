@@ -1,0 +1,10 @@
+{
+  "id": "T-12a1a137-96f3-44bb-a8e9-b70371474d5f",
+  "subject": "Rework UI to Apple Design System",
+  "description": "Transform semar-kos-finder UI from sage/steel/peach to Apple design language. Modify layout.tsx (add nav bar) and Map.tsx (restyle popups, markers, buttons).",
+  "status": "completed",
+  "activeForm": "Finished reworking UI to Apple Design System",
+  "blocks": [],
+  "blockedBy": [],
+  "threadID": "ses_28493140dffecddVCreykqos9X"
+}

@@ -1,0 +1,10 @@
+{
+  "id": "T-88325d02-4b71-447a-acfb-4d431863889b",
+  "subject": "Change Telegram integration to use Draw ID",
+  "description": "Modify send_violation_to_telegram function to convert vehicle IDs to draw IDs (using id_modulo from cctv_data) before sending to Telegram. Update the function signature and calling code to pass cctv_data for the conversion.",
+  "status": "completed",
+  "activeForm": "Changing Telegram integration to send Draw ID instead of Vehicle ID",
+  "blocks": [],
+  "blockedBy": [],
+  "threadID": "ses_274a17b1dffeBhg0JxjGhE6K2G"
+}

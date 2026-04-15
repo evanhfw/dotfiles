@@ -1,0 +1,10 @@
+{
+  "id": "T-e9323432-72e8-4940-826e-339ec38751b2",
+  "subject": "Rework layout.tsx to Apple Design System",
+  "description": "Add Apple-style glass navigation bar, remove Plus Jakarta Sans font, update popup CSS to solid colors",
+  "status": "in_progress",
+  "activeForm": "Updating layout.tsx to Apple Design System",
+  "blocks": [],
+  "blockedBy": [],
+  "threadID": "ses_284935f3affesqeLYPc5GInDhZ"
+}
