@@ -61,11 +61,14 @@ elif [[ "$PKG_MANAGER" == "dnf" ]]; then
     fzf \
     zoxide \
     ripgrep \
-    fd-find \
     tmux
+
+  if ! has fd && ! has fdfind; then
+    sudo dnf install -y fd-find || sudo dnf install -y fd
+  fi
 fi
 
-# fd-find installs as 'fdfind' on Ubuntu — symlink to 'fd'
+# Some distros install fd as 'fdfind' — symlink to 'fd'
 if has fdfind && ! has fd; then
   ln -sf "$(which fdfind)" "$LOCAL_BIN/fd"
   success "symlinked fdfind → fd"
