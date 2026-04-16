@@ -27,6 +27,7 @@ export PATH="$HOME/go/bin:$PATH"
 export PATH="$HOME/.bun/bin:$PATH"
 export PATH="$HOME/.opencode/bin:$PATH"
 export PATH="$HOME/bin:$PATH"
+export PATH="$PATH:/opt/nvim-linux-x86_64/bin"
 
 alias ..="cd .."
 alias ...="cd ../.."
@@ -42,3 +43,4 @@ alias ll="eza -al --icons --group-directories-first"
 eval "$(zoxide init zsh --cmd cd)"
 eval "$(starship init zsh)"
 
+fastfetch
