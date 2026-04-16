@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # run_once_00_base.sh
-# Install base system packages via apt or pacman
+# Install base system packages via apt, pacman, or dnf
 # Safe to re-run (run_once guarantees single execution per machine)
 
 set -euo pipefail
@@ -19,8 +19,10 @@ if has apt-get; then
   PKG_MANAGER="apt"
 elif has pacman; then
   PKG_MANAGER="pacman"
+elif has dnf; then
+  PKG_MANAGER="dnf"
 else
-  echo "[base] ERROR: No supported package manager found (apt / pacman)"
+  echo "[base] ERROR: No supported package manager found (apt / pacman / dnf)"
   exit 1
 fi
 
@@ -55,6 +57,19 @@ PACMAN_PACKAGES=(
   base-devel
 )
 
+DNF_PACKAGES=(
+  curl wget git unzip zip tar
+  p7zip p7zip-plugins
+  gnupg2 ca-certificates
+  jq
+  xclip
+  zsh
+  tmux
+  direnv
+  btop
+  gcc gcc-c++ make
+)
+
 # ── Install ───────────────────────────────────────────────────────────────────
 
 if [[ "$PKG_MANAGER" == "apt" ]]; then
@@ -70,6 +85,10 @@ elif [[ "$PKG_MANAGER" == "pacman" ]]; then
 
   info "Installing pacman packages..."
   sudo pacman -S --noconfirm --needed "${PACMAN_PACKAGES[@]}"
+
+elif [[ "$PKG_MANAGER" == "dnf" ]]; then
+  info "Installing dnf packages..."
+  sudo dnf install -y "${DNF_PACKAGES[@]}"
 fi
 
 success "Base packages installed."

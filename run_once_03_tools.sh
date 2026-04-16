@@ -4,7 +4,7 @@
 #   fzf, zoxide, lazygit, yazi, eza, bat, ripgrep, fd, dust, tldr, fastfetch
 #
 # Strategy:
-#   - Use apt/pacman where the package is up-to-date enough
+#   - Use apt/pacman/dnf where the package is up-to-date enough
 #   - Fall back to GitHub binary releases for tools that are stale/missing in apt
 #   - No cargo, no pip, no npm — binary only
 
@@ -27,6 +27,8 @@ if command -v apt-get &>/dev/null; then
   PKG_MANAGER="apt"
 elif command -v pacman &>/dev/null; then
   PKG_MANAGER="pacman"
+elif command -v dnf &>/dev/null; then
+  PKG_MANAGER="dnf"
 else
   echo "[tools] ERROR: No supported package manager found."
   exit 1
@@ -43,18 +45,34 @@ if [[ "$PKG_MANAGER" == "pacman" ]]; then
   # On Arch, everything is available and up-to-date — no fallback needed
 fi
 
-# ── APT path: mix of apt + GitHub binary releases ────────────────────────────
-# apt packages that are reliable enough on Ubuntu/Debian:
+# ── APT/DNF path: mix of package manager + GitHub binary releases ───────────
 
-info "Installing apt-available tools..."
-sudo apt-get install -y --no-install-recommends \
-  fzf \
-  zoxide \
-  ripgrep \
-  fd-find \
-  tmux
+if [[ "$PKG_MANAGER" == "apt" ]]; then
+  info "Installing apt-available tools..."
+  sudo apt-get install -y --no-install-recommends \
+    fzf \
+    zoxide \
+    ripgrep \
+    tmux
+elif [[ "$PKG_MANAGER" == "dnf" ]]; then
+  info "Installing dnf-available tools..."
+  sudo dnf install -y \
+    fzf \
+    zoxide \
+    ripgrep \
+    tmux
+fi
 
-# fd-find installs as 'fdfind' on Ubuntu — symlink to 'fd'
+# apt/dnf may expose fd as fd-find/fdfind, while pacman already installs `fd`
+if ! has fd && ! has fdfind; then
+  if [[ "$PKG_MANAGER" == "apt" ]]; then
+    sudo apt-get install -y --no-install-recommends fd-find || sudo apt-get install -y --no-install-recommends fd
+  elif [[ "$PKG_MANAGER" == "dnf" ]]; then
+    sudo dnf install -y fd-find || sudo dnf install -y fd
+  fi
+fi
+
+# Some distros install fd as 'fdfind' — symlink to 'fd'
 if has fdfind && ! has fd; then
   ln -sf "$(which fdfind)" "$LOCAL_BIN/fd"
   success "symlinked fdfind → fd"
@@ -201,13 +219,24 @@ install_fastfetch() {
   VERSION=$(curl -sL "https://api.github.com/repos/fastfetch-cli/fastfetch/releases/latest" \
     | grep '"tag_name"' | cut -d'"' -f4)
 
-  local URL="https://github.com/fastfetch-cli/fastfetch/releases/latest/download/fastfetch-linux-${ARCH_STR}.deb"
+  local URL
+  local PKG_EXT
+  if [[ "$PKG_MANAGER" == "dnf" ]]; then
+    PKG_EXT="rpm"
+  else
+    PKG_EXT="deb"
+  fi
+  URL="https://github.com/fastfetch-cli/fastfetch/releases/latest/download/fastfetch-linux-${ARCH_STR}.${PKG_EXT}"
   local TMPDIR
   TMPDIR=$(mktemp -d)
   trap 'rm -rf "$TMPDIR"' RETURN
 
-  curl -L --progress-bar "$URL" -o "$TMPDIR/fastfetch.deb"
-  sudo dpkg -i "$TMPDIR/fastfetch.deb"
+  curl -L --progress-bar "$URL" -o "$TMPDIR/fastfetch.${PKG_EXT}"
+  if [[ "$PKG_MANAGER" == "dnf" ]]; then
+    sudo dnf install -y "$TMPDIR/fastfetch.${PKG_EXT}"
+  else
+    sudo dpkg -i "$TMPDIR/fastfetch.${PKG_EXT}"
+  fi
   success "fastfetch installed."
 }
 
