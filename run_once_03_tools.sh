@@ -53,7 +53,6 @@ if [[ "$PKG_MANAGER" == "apt" ]]; then
     fzf \
     zoxide \
     ripgrep \
-    fd-find \
     tmux
 elif [[ "$PKG_MANAGER" == "dnf" ]]; then
   info "Installing dnf-available tools..."
@@ -62,8 +61,12 @@ elif [[ "$PKG_MANAGER" == "dnf" ]]; then
     zoxide \
     ripgrep \
     tmux
+fi
 
-  if ! has fd && ! has fdfind; then
+if ! has fd && ! has fdfind; then
+  if [[ "$PKG_MANAGER" == "apt" ]]; then
+    sudo apt-get install -y --no-install-recommends fd-find || sudo apt-get install -y --no-install-recommends fd
+  elif [[ "$PKG_MANAGER" == "dnf" ]]; then
     sudo dnf install -y fd-find || sudo dnf install -y fd
   fi
 fi
