@@ -40,7 +40,14 @@ alias y="yazi"
 alias ls="eza --icons"
 alias ll="eza -al --icons --group-directories-first"
 
-eval "$(zoxide init zsh --cmd cd)"
-eval "$(starship init zsh)"
+if command -v zoxide >/dev/null 2>&1; then
+  eval "$(zoxide init zsh --cmd cd)"
+fi
 
-fastfetch
+if command -v starship >/dev/null 2>&1; then
+  eval "$(starship init zsh)"
+fi
+
+if command -v fastfetch >/dev/null 2>&1; then
+  fastfetch
+fi

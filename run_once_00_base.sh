@@ -65,9 +65,12 @@ DNF_PACKAGES=(
   xclip
   zsh
   tmux
-  direnv
   btop
   gcc gcc-c++ make
+)
+
+DNF_OPTIONAL_PACKAGES=(
+  direnv
 )
 
 # ── Install ───────────────────────────────────────────────────────────────────
@@ -89,6 +92,14 @@ elif [[ "$PKG_MANAGER" == "pacman" ]]; then
 elif [[ "$PKG_MANAGER" == "dnf" ]]; then
   info "Installing dnf packages..."
   sudo dnf install -y "${DNF_PACKAGES[@]}"
+
+  for pkg in "${DNF_OPTIONAL_PACKAGES[@]}"; do
+    if sudo dnf install -y "$pkg"; then
+      success "Optional package installed: $pkg"
+    else
+      warning "Optional package unavailable, skipping: $pkg"
+    fi
+  done
 fi
 
 success "Base packages installed."
