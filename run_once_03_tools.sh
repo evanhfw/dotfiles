@@ -63,6 +63,7 @@ elif [[ "$PKG_MANAGER" == "dnf" ]]; then
     tmux
 fi
 
+# apt/dnf may expose fd as fd-find/fdfind, while pacman already installs `fd`
 if ! has fd && ! has fdfind; then
   if [[ "$PKG_MANAGER" == "apt" ]]; then
     sudo apt-get install -y --no-install-recommends fd-find || sudo apt-get install -y --no-install-recommends fd
