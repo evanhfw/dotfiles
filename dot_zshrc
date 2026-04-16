@@ -39,13 +39,11 @@ alias fd="fdfind"
 alias y="yazi"
 alias ls="eza --icons"
 alias ll="eza -al --icons --group-directories-first"
+source <(fzf --zsh)
 
 if command -v zoxide >/dev/null 2>&1; then
   eval "$(zoxide init zsh --cmd cd)"
 fi
-eval "$(starship init zsh)"
-source ~/.fzf/shell/completion.zsh
-source ~/.fzf/shell/key-bindings.zsh
 
 if command -v starship >/dev/null 2>&1; then
   eval "$(starship init zsh)"
