@@ -13,6 +13,46 @@ warning() { echo "[base] ⚠ $*"; }
 
 has() { command -v "$1" &>/dev/null; }
 
+# ── Ubuntu apt mirror helper ──────────────────────────────────────────────────
+
+configure_ubuntu_apt_mirror() {
+  local mirror_uri="mirror://mirrors.ubuntu.com/mirrors.txt"
+
+  [[ -r /etc/os-release ]] || return 0
+  # shellcheck disable=SC1091
+  source /etc/os-release
+  [[ "${ID:-}" == "ubuntu" ]] || return 0
+
+  if [[ -f /etc/apt/sources.list.d/ubuntu.sources ]]; then
+    if grep -q "^URIs: ${mirror_uri}$" /etc/apt/sources.list.d/ubuntu.sources; then
+      info "Ubuntu mirrorlist already configured in ubuntu.sources."
+    else
+      info "Configuring Ubuntu mirrorlist in ubuntu.sources..."
+      if ! sudo test -f /etc/apt/sources.list.d/ubuntu.sources.bak; then
+        sudo cp /etc/apt/sources.list.d/ubuntu.sources /etc/apt/sources.list.d/ubuntu.sources.bak
+      fi
+      sudo sed -i -E "s|^URIs: .*|URIs: ${mirror_uri}|" /etc/apt/sources.list.d/ubuntu.sources
+      success "Ubuntu mirrorlist configured."
+    fi
+    return 0
+  fi
+
+  if [[ -f /etc/apt/sources.list ]]; then
+    if grep -q "mirror://mirrors.ubuntu.com/mirrors.txt" /etc/apt/sources.list; then
+      info "Ubuntu mirrorlist already configured in sources.list."
+    else
+      info "Configuring Ubuntu mirrorlist in sources.list..."
+      if ! sudo test -f /etc/apt/sources.list.bak; then
+        sudo cp /etc/apt/sources.list /etc/apt/sources.list.bak
+      fi
+      sudo sed -i -E \
+        "s|https?://([a-zA-Z0-9.-]+\\.)?archive.ubuntu.com/ubuntu|${mirror_uri}|g; s|https?://security.ubuntu.com/ubuntu|${mirror_uri}|g" \
+        /etc/apt/sources.list
+      success "Ubuntu mirrorlist configured."
+    fi
+  fi
+}
+
 # ── Detect package manager ───────────────────────────────────────────────────
 
 if has apt-get; then
@@ -76,6 +116,8 @@ DNF_OPTIONAL_PACKAGES=(
 # ── Install ───────────────────────────────────────────────────────────────────
 
 if [[ "$PKG_MANAGER" == "apt" ]]; then
+  configure_ubuntu_apt_mirror
+
   info "Updating apt..."
   sudo apt-get update -qq
 
