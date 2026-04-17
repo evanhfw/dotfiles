@@ -17,6 +17,7 @@ has() { command -v "$1" &>/dev/null; }
 
 configure_ubuntu_apt_mirror() {
   local mirror_uri="mirror://mirrors.ubuntu.com/mirrors.txt"
+  local mirror_uri_escaped="${mirror_uri//&/\\&}"
 
   [[ -r /etc/os-release ]] || return 0
   # shellcheck disable=SC1091
@@ -24,21 +25,21 @@ configure_ubuntu_apt_mirror() {
   [[ "${ID:-}" == "ubuntu" ]] || return 0
 
   if [[ -f /etc/apt/sources.list.d/ubuntu.sources ]]; then
-    if grep -q "^URIs: ${mirror_uri}$" /etc/apt/sources.list.d/ubuntu.sources; then
+    if grep -Fxq "URIs: ${mirror_uri}" /etc/apt/sources.list.d/ubuntu.sources; then
       info "Ubuntu mirrorlist already configured in ubuntu.sources."
     else
       info "Configuring Ubuntu mirrorlist in ubuntu.sources..."
       if ! sudo test -f /etc/apt/sources.list.d/ubuntu.sources.bak; then
         sudo cp /etc/apt/sources.list.d/ubuntu.sources /etc/apt/sources.list.d/ubuntu.sources.bak
       fi
-      sudo sed -i -E "s|^URIs: .*|URIs: ${mirror_uri}|" /etc/apt/sources.list.d/ubuntu.sources
+      sudo sed -i -E "s|^URIs: .*|URIs: ${mirror_uri_escaped}|" /etc/apt/sources.list.d/ubuntu.sources
       success "Ubuntu mirrorlist configured."
     fi
     return 0
   fi
 
   if [[ -f /etc/apt/sources.list ]]; then
-    if grep -q "mirror://mirrors.ubuntu.com/mirrors.txt" /etc/apt/sources.list; then
+    if grep -Fq "$mirror_uri" /etc/apt/sources.list; then
       info "Ubuntu mirrorlist already configured in sources.list."
     else
       info "Configuring Ubuntu mirrorlist in sources.list..."
@@ -46,7 +47,7 @@ configure_ubuntu_apt_mirror() {
         sudo cp /etc/apt/sources.list /etc/apt/sources.list.bak
       fi
       sudo sed -i -E \
-        "s|https?://([a-zA-Z0-9.-]+\\.)?archive.ubuntu.com/ubuntu|${mirror_uri}|g; s|https?://security.ubuntu.com/ubuntu|${mirror_uri}|g" \
+        "s|https?://([a-zA-Z0-9.-]+\\.)?archive.ubuntu.com/ubuntu|${mirror_uri_escaped}|g; s|https?://security.ubuntu.com/ubuntu|${mirror_uri_escaped}|g" \
         /etc/apt/sources.list
       success "Ubuntu mirrorlist configured."
     fi
