@@ -32,7 +32,9 @@ configure_ubuntu_apt_mirror() {
       if ! sudo test -f /etc/apt/sources.list.d/ubuntu.sources.bak; then
         sudo cp /etc/apt/sources.list.d/ubuntu.sources /etc/apt/sources.list.d/ubuntu.sources.bak
       fi
-      sudo sed -i -E "s|^URIs: .*|URIs: ${mirror_uri_escaped}|" /etc/apt/sources.list.d/ubuntu.sources
+      sudo sed -i -E \
+        "s|^URIs:[[:space:]]+https?://([a-zA-Z0-9._-]+\\.)?archive.ubuntu.com/ubuntu$|URIs: ${mirror_uri_escaped}|" \
+        /etc/apt/sources.list.d/ubuntu.sources
       success "Ubuntu mirrorlist configured."
     fi
     return 0
@@ -47,7 +49,7 @@ configure_ubuntu_apt_mirror() {
         sudo cp /etc/apt/sources.list /etc/apt/sources.list.bak
       fi
       sudo sed -i -E \
-        "s|https?://([a-zA-Z0-9._-]+\\.)?archive.ubuntu.com/ubuntu|${mirror_uri_escaped}|g; s|https?://security.ubuntu.com/ubuntu|${mirror_uri_escaped}|g" \
+        "s|https?://([a-zA-Z0-9._-]+\\.)?archive.ubuntu.com/ubuntu|${mirror_uri_escaped}|g" \
         /etc/apt/sources.list
       success "Ubuntu mirrorlist configured."
     fi
