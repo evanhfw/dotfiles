@@ -25,7 +25,7 @@ configure_ubuntu_apt_mirror() {
   [[ "${ID:-}" == "ubuntu" ]] || return 0
 
   if [[ -f /etc/apt/sources.list.d/ubuntu.sources ]]; then
-    if grep -Fxq "URIs: ${mirror_uri}" /etc/apt/sources.list.d/ubuntu.sources; then
+    if grep -Fq "URIs: ${mirror_uri}" /etc/apt/sources.list.d/ubuntu.sources; then
       info "Ubuntu mirrorlist already configured in ubuntu.sources."
     else
       info "Configuring Ubuntu mirrorlist in ubuntu.sources..."
@@ -47,7 +47,7 @@ configure_ubuntu_apt_mirror() {
         sudo cp /etc/apt/sources.list /etc/apt/sources.list.bak
       fi
       sudo sed -i -E \
-        "s|https?://([a-zA-Z0-9.-]+\\.)?archive.ubuntu.com/ubuntu|${mirror_uri_escaped}|g; s|https?://security.ubuntu.com/ubuntu|${mirror_uri_escaped}|g" \
+        "s|https?://([a-zA-Z0-9._-]+\\.)?archive.ubuntu.com/ubuntu|${mirror_uri_escaped}|g; s|https?://security.ubuntu.com/ubuntu|${mirror_uri_escaped}|g" \
         /etc/apt/sources.list
       success "Ubuntu mirrorlist configured."
     fi
