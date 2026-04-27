@@ -4,13 +4,101 @@
   "experimental": {
     "disable_paste_summary": true
   },
-  "plugin": [
-    "oh-my-openagent@latest"
-  ],
-  "provider": {},
+  "provider": {
+    "9router": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "9Router",
+      "options": {
+        "baseURL": "https://9router.ehw.my.id/v1"
+      },
+      "models": {
+        "ocg/kimi-k2.6": { "name": "Kimi K2.6 (OCG)" },
+        "ocg/kimi-k2.5": { "name": "Kimi K2.5 (OCG)" },
+        "ocg/glm-5.1": { "name": "GLM 5.1 (OCG)" },
+        "ocg/glm-5": { "name": "GLM 5 (OCG)" },
+        "ocg/qwen3.5-plus": { "name": "Qwen 3.5 Plus (OCG)" },
+        "ocg/qwen3.6-plus": { "name": "Qwen 3.6 Plus (OCG)" },
+        "ocg/mimo-v2-pro": { "name": "Mimo V2 Pro (OCG)" },
+        "ocg/mimo-v2-omni": { "name": "Mimo V2 Omni (OCG)" },
+        "ocg/minimax-m2.7": { "name": "MiniMax M2.7 (OCG)" },
+        "ocg/minimax-m2.5": { "name": "MiniMax M2.5 (OCG)" },
+        "ocg/deepseek-v4-pro": { "name": "DeepSeek V4 Pro (OCG)" },
+        "ocg/deepseek-v4-pro-low": { "name": "DeepSeek V4 Pro Low (OCG)" },
+        "ocg/deepseek-v4-pro-medium": { "name": "DeepSeek V4 Pro Medium (OCG)" },
+        "ocg/deepseek-v4-pro-high": { "name": "DeepSeek V4 Pro High (OCG)" },
+        "ocg/deepseek-v4-pro-max": { "name": "DeepSeek V4 Pro Max (OCG)" },
+        "ocg/deepseek-v4-flash": { "name": "DeepSeek V4 Flash (OCG)" },
+        "ocg/deepseek-v4-flash-low": { "name": "DeepSeek V4 Flash Low (OCG)" },
+        "ocg/deepseek-v4-flash-medium": { "name": "DeepSeek V4 Flash Medium (OCG)" },
+        "ocg/deepseek-v4-flash-high": { "name": "DeepSeek V4 Flash High (OCG)" },
+        "ocg/deepseek-v4-flash-max": { "name": "DeepSeek V4 Flash Max (OCG)" },
+        "cx/gpt-5.5": { "name": "GPT 5.5 (CX OpenAI)" },
+        "cx/gpt-5.4": { "name": "GPT 5.4 (CX OpenAI)" },
+        "cx/gpt-5.3-codex": { "name": "GPT 5.3 Codex (CX OpenAI)" },
+        "cx/gpt-5.3-codex-xhigh": { "name": "GPT 5.3 Codex XHigh (CX OpenAI)" },
+        "cx/gpt-5.3-codex-high": { "name": "GPT 5.3 Codex High (CX OpenAI)" },
+        "cx/gpt-5.3-codex-low": { "name": "GPT 5.3 Codex Low (CX OpenAI)" },
+        "cx/gpt-5.3-codex-none": { "name": "GPT 5.3 Codex None (CX OpenAI)" },
+        "cx/gpt-5.3-codex-spark": { "name": "GPT 5.3 Codex Spark (CX OpenAI)" },
+        "cx/gpt-5.2-codex": { "name": "GPT 5.2 Codex (CX OpenAI)" },
+        "cx/gpt-5.2": { "name": "GPT 5.2 (CX OpenAI)" },
+        "cx/gpt-5.1-codex": { "name": "GPT 5.1 Codex (CX OpenAI)" },
+        "cx/gpt-5.1-codex-max": { "name": "GPT 5.1 Codex Max (CX OpenAI)" },
+        "cx/gpt-5.1-codex-mini": { "name": "GPT 5.1 Codex Mini (CX OpenAI)" },
+        "cx/gpt-5.1-codex-mini-high": { "name": "GPT 5.1 Codex Mini High (CX OpenAI)" },
+        "cx/gpt-5.1": { "name": "GPT 5.1 (CX OpenAI)" },
+        "cx/gpt-5-codex": { "name": "GPT 5 Codex (CX OpenAI)" },
+        "cx/gpt-5-codex-mini": { "name": "GPT 5 Codex Mini (CX OpenAI)" },
+        "gh/gpt-3.5-turbo": { "name": "GPT 3.5 Turbo (GH Copilot)" },
+        "gh/gpt-4": { "name": "GPT 4 (GH Copilot)" },
+        "gh/gpt-4o": { "name": "GPT 4o (GH Copilot)" },
+        "gh/gpt-4o-mini": { "name": "GPT 4o Mini (GH Copilot)" },
+        "gh/gpt-4.1": { "name": "GPT 4.1 (GH Copilot)" },
+        "gh/gpt-5-mini": { "name": "GPT 5 Mini (GH Copilot)" },
+        "gh/gpt-5.2": { "name": "GPT 5.2 (GH Copilot)" },
+        "gh/gpt-5.2-codex": { "name": "GPT 5.2 Codex (GH Copilot)" },
+        "gh/gpt-5.3-codex": { "name": "GPT 5.3 Codex (GH Copilot)" },
+        "gh/gpt-5.4": { "name": "GPT 5.4 (GH Copilot)" },
+        "gh/gpt-5.4-mini": { "name": "GPT 5.4 Mini (GH Copilot)" },
+        "gh/claude-haiku-4.5": { "name": "Claude Haiku 4.5 (GH Copilot)" },
+        "gh/claude-opus-4.5": { "name": "Claude Opus 4.5 (GH Copilot)" },
+        "gh/claude-sonnet-4": { "name": "Claude Sonnet 4 (GH Copilot)" },
+        "gh/claude-sonnet-4.5": { "name": "Claude Sonnet 4.5 (GH Copilot)" },
+        "gh/claude-sonnet-4.6": { "name": "Claude Sonnet 4.6 (GH Copilot)" },
+        "gh/claude-opus-4.6": { "name": "Claude Opus 4.6 (GH Copilot)" },
+        "gh/claude-opus-4.7": { "name": "Claude Opus 4.7 (GH Copilot)" },
+        "gh/gemini-2.5-pro": { "name": "Gemini 2.5 Pro (GH Copilot)" },
+        "gh/gemini-3-flash-preview": { "name": "Gemini 3 Flash Preview (GH Copilot)" },
+        "gh/gemini-3.1-pro-preview": { "name": "Gemini 3.1 Pro Preview (GH Copilot)" },
+        "gh/grok-code-fast-1": { "name": "Grok Code Fast 1 (GH Copilot)" },
+        "gh/oswe-vscode-prime": { "name": "OSWE VSCode Prime (GH Copilot)" },
+        "gh/goldeneye-free-auto": { "name": "GoldenEye Free Auto (GH Copilot)" }
+      }
+    }
+  },
   "permission": {
     "skill": {
       "*": "deny"
+    }
+  },
+  "mcp": {
+    "context7": {
+      "type": "remote",
+      "url": "https://mcp.context7.com/mcp",
+      "enabled": true,
+      "headers": {
+        "CONTEXT7_API_KEY": 
+      }
+    },
+    "exa": {
+      "type": "remote",
+      "url": "https://mcp.exa.ai/mcp",
+      "enabled": true
+    },
+    "websets": {
+      "type": "remote",
+      "url": "https://websetsmcp.exa.ai/mcp?exaApiKey=-4f67-a546-",
+      "enabled": true
     }
   }
 }

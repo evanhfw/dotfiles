@@ -1,7 +1,6 @@
 ---
 description: Generates clear and structured merge request summaries from git changes
 mode: subagent
-model: google/antigravity-claude-sonnet-4-5
 temperature: 0.2
 tools:
   edit: false
