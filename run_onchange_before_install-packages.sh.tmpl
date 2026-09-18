@@ -30,21 +30,40 @@ brew install \
 
 if command -v apt-get >/dev/null; then
   sudo apt-get update -qq
-  sudo apt-get install -y zsh neovim ripgrep fzf build-essential git curl unzip nodejs npm || warn_retry
-  # opsional: nggak semua distro punya → jangan gagalkan script
-  sudo apt-get install -y zsh-autosuggestions zsh-syntax-highlighting \
-    zoxide direnv bat fd-find eza || true
+  sudo apt-get install -y zsh neovim ripgrep fzf build-essential git curl unzip file nodejs npm || warn_retry
+  opt_mgr=apt
+  # zsh-completions NGGAK ADA di Ubuntu (dicek via Launchpad API) — jangan dipaksa.
+  # Completion Debian datang dari zsh-common → /usr/share/zsh/vendor-completions,
+  # dan .zshrc sudah mencari folder itu.
+  opt_pkgs="zsh-autosuggestions zsh-syntax-highlighting zoxide direnv bat fd-find eza"
 elif command -v dnf >/dev/null; then
-  sudo dnf install -y zsh neovim ripgrep fzf gcc make git curl unzip nodejs npm || warn_retry
-  sudo dnf install -y zsh-autosuggestions zsh-syntax-highlighting zsh-completions \
-    zoxide direnv bat fd-find eza || true
+  sudo dnf install -y zsh neovim ripgrep fzf gcc make git curl unzip file nodejs npm || warn_retry
+  opt_mgr=dnf
+  opt_pkgs="zsh-autosuggestions zsh-syntax-highlighting zoxide direnv bat fd-find eza"
 elif command -v pacman >/dev/null; then
-  sudo pacman -S --needed --noconfirm zsh neovim ripgrep fzf base-devel git curl unzip nodejs npm || warn_retry
-  # Arch punya hampir semuanya di [extra] (diverifikasi via API archlinux.org)
-  sudo pacman -S --needed --noconfirm zsh-autosuggestions zsh-syntax-highlighting zsh-completions \
-    zoxide direnv bat fd eza yazi lazygit mise starship || true
+  sudo pacman -S --needed --noconfirm zsh neovim ripgrep fzf base-devel git curl unzip file nodejs npm || warn_retry
+  opt_mgr=pacman
+  # Arch punya semuanya di [extra] (diverifikasi via API archlinux.org)
+  opt_pkgs="zsh-autosuggestions zsh-syntax-highlighting zsh-completions zoxide direnv bat fd eza yazi lazygit mise starship"
 else
-  echo "!! package manager tak dikenal — install manual: zsh neovim ripgrep fd fzf gcc git node starship zoxide eza mise"
+  opt_mgr=""
+  opt_pkgs=""
+  echo "!! package manager tak dikenal — install manual: zsh neovim ripgrep fd fzf file gcc git node starship zoxide eza mise"
+fi
+
+# --- paket opsional: dipasang SATU-SATU -------------------------------------
+# apt/dnf/pacman membatalkan SELURUH instalasi kalau ada satu nama paket yang
+# nggak dikenal. Jadi batch = satu nama salah, semua ikut gagal.
+# Contoh nyata: `zsh-completions` nggak ada di Ubuntu → eza/fd/bat/zoxide
+# sebenarnya kepasang semua nggak. Diam-diam aja.
+if [ -n "$opt_mgr" ]; then
+  for p in $opt_pkgs; do
+    case "$opt_mgr" in
+      apt)    sudo apt-get install -y "$p" >/dev/null 2>&1 ;;
+      dnf)    sudo dnf install -y "$p" >/dev/null 2>&1 ;;
+      pacman) sudo pacman -S --needed --noconfirm "$p" >/dev/null 2>&1 ;;
+    esac || echo "   (opsional, nggak tersedia di repo: $p)"
+  done
 fi
 
 # --- Debian/Ubuntu rename biner: fd → fdfind, bat → batcat -------------------
@@ -77,9 +96,39 @@ fi
 command -v starship >/dev/null || curl -fsSL https://starship.rs/install.sh | sh -s -- -y || warn_retry
 command -v mise     >/dev/null || curl -fsSL https://mise.run | sh || warn_retry
 # uv diurus mise (lihat dot_config/mise/config.toml) — jangan pasang dobel
-# herdr & carapace belum ada di apt/dnf/pacman:
-#   carapace → AUR (carapace-bin) atau https://github.com/carapace-sh/carapace-bin
-#   herdr    → lihat dokumentasi herdr
+
+# --- yazi: nggak ada di apt/dnf — rilis resmi (zip) -------------------------
+if ! command -v yazi >/dev/null 2>&1; then
+  yz_arch=x86_64
+  case "$(uname -m)" in aarch64|arm64) yz_arch=aarch64 ;; esac
+  yz_tmp="$(mktemp -d)"
+  echo "==> yazi ($yz_arch)"
+  if curl -fL "https://github.com/sxyazi/yazi/releases/latest/download/yazi-${yz_arch}-unknown-linux-gnu.zip" -o "$yz_tmp/yazi.zip"; then
+    mkdir -p "$HOME/.local/bin"
+    unzip -oq "$yz_tmp/yazi.zip" -d "$yz_tmp"
+    find "$yz_tmp" -type f \( -name yazi -o -name ya \) -exec cp {} "$HOME/.local/bin/" \;
+    chmod +x "$HOME/.local/bin/yazi" "$HOME/.local/bin/ya" 2>/dev/null
+    echo "==> yazi terpasang"
+  else
+    echo "!! yazi gagal diunduh"
+  fi
+  rm -rf "$yz_tmp"
+fi
+
+# --- carapace: nggak ada di apt/dnf/pacman — rilis resmi (tar.gz) ----------
+if ! command -v carapace >/dev/null 2>&1; then
+  cp_arch=amd64
+  case "$(uname -m)" in aarch64|arm64) cp_arch=arm64 ;; esac
+  cp_ver="$(curl -fsSL https://api.github.com/repos/carapace-sh/carapace-bin/releases/latest 2>/dev/null |
+    sed -n 's/.*"tag_name" *: *"v\([^"]*\)".*/\1/p' | head -1)"
+  if [ -n "$cp_ver" ]; then
+    echo "==> carapace v$cp_ver ($cp_arch)"
+    mkdir -p "$HOME/.local/bin"
+    curl -fL "https://github.com/carapace-sh/carapace-bin/releases/download/v${cp_ver}/carapace-bin_${cp_ver}_linux_${cp_arch}.tar.gz" |
+      tar -xz -C "$HOME/.local/bin" carapace && echo "==> carapace terpasang"
+  fi
+fi
+# herdr belum ada paket Linux — lihat dokumentasi herdr
 
 {{- end }}
 
