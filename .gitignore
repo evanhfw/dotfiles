@@ -1,2 +1,28 @@
+# Kredensial & runtime state — JANGAN pernah masuk git.
+# Repo ini PUBLIC.
+
+# Encrypted secrets (age) tetap di-ignore: kunci dekripsi ada di
+# ~/.config/chezmoi/key.txt, bukan di repo.
+**/*.age
+**/secrets/**
+
+# Token/API key pi agent.
+dot_config/pi/agent/auth.json
+dot_config/pi/agent/telegram.json
+dot_config/pi/agent/9router-config.json
+dot_config/pi/agent/*.key
+
+# Runtime state.
+dot_config/opencode/node_modules/
+dot_config/opencode/skills/
+dot_config/opencode/tasks/
+dot_config/opencode/package-lock.json
+dot_config/pi/agent/sessions/
+dot_config/pi/agent/tmp/
+*.log
+session.json
+plugins.json
+
+# Backup lokal.
 .DS_Store
 *.bak-*

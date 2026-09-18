@@ -1,0 +1,42 @@
+# ~/.local/share/chezmoi/.chezmoiignore — managed by chezmoi
+#
+# File di source dir yang TIDAK boleh di-copy ke home, per-OS.
+
+# Dokumentasi repo, bukan target di home directory.
+README.md
+
+# --- Runtime / generated state: jangan pernah disinkronkan -------------------
+.config/opencode/node_modules/**
+.config/opencode/package-lock.json
+.config/opencode/*.bak
+.config/opencode/*.backup-*
+.config/pi/agent/sessions/**
+.config/pi/agent/tmp/**
+.config/pi/agent/fff/**
+.config/pi/agent/git/**
+.config/pi/agent/auth.json
+.config/pi/agent/models-store.json
+.config/pi/agent/*.log
+**/secrets/**
+**/*.age
+session.json
+plugins.json
+*.log
+
+# --- Scope per-OS ------------------------------------------------------------
+{{ if eq .chezmoi.os "windows" }}
+# Windows: cuma VSCodium yang relevan.
+.config/**
+.gitconfig
+.zshenv
+Library/**
+{{ else }}
+AppData/**
+{{ end }}
+
+{{ if eq .chezmoi.os "darwin" }}
+# macOS punya lokasi VSCodium native sendiri.
+.config/VSCodium/**
+{{ else }}
+Library/**
+{{ end }}

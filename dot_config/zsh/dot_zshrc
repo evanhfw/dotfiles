@@ -1,5 +1,5 @@
 # ~/.config/zsh/.zshrc — managed by chezmoi
-# (dipanggil lewat ZDOTDIR yang di-set di ~/.zshenv)
+# (dipanggil lewat ZDOTDIR yang di-set di ~/.config/zsh/.zshenv)
 
 # --- Homebrew ---------------------------------------------------------------
 if [[ -z ${HOMEBREW_PREFIX:-} ]] || ! command -v brew >/dev/null 2>&1; then
@@ -9,7 +9,24 @@ if [[ -z ${HOMEBREW_PREFIX:-} ]] || ! command -v brew >/dev/null 2>&1; then
   unset _brew
 fi
 
-export PATH="$HOME/.local/bin:$PATH"
+# --- PATH -------------------------------------------------------------------
+# Urutan penting: ~/.local/bin duluan (biner yang kita install sendiri:
+# nvim tarball, yazi, carapace, lazygit), lalu toolchain pribadi per-mesin.
+# Ditulis terbalik karena tiap entri di-prepend → yang terakhir jadi pertama.
+# `typeset -U path` bikin zsh otomatis dedupe.
+typeset -U path PATH
+for _p in \
+  "$HOME/.fzf/bin" \
+  "$HOME/.local/share/go/bin" \
+  "$HOME/bin" \
+  "$HOME/.brv-cli/bin" \
+  "$HOME/.opencode/bin" \
+  "$HOME/.bun/bin" \
+  "$HOME/.hermes/node/bin" \
+  "$HOME/.local/bin"; do
+  [[ -d $_p ]] && path=("$_p" $path)
+done
+unset _p
 
 # --- editor -----------------------------------------------------------------
 # Wajib: yazi (dan git, lazygit) ambil opening-nya dari $EDITOR. Kalau unset,
@@ -142,3 +159,14 @@ source_zsh_plugin \
 
 # --- prompt (paling akhir) --------------------------------------------------
 command -v starship >/dev/null 2>&1 && eval "$(starship init zsh)"
+
+# --- alias QoL --------------------------------------------------------------
+alias ..='cd ..'
+alias ...='cd ../..'
+alias df='df -h'
+alias zshrc='nvim $ZDOTDIR/.zshrc'
+alias reload='source $ZDOTDIR/.zshrc'
+alias ff='fastfetch'
+command -v lazygit >/dev/null 2>&1 && alias lg='lazygit'
+
+# `y` sudah didefinisikan sebagai fungsi di atas (pindah cwd setelah keluar).

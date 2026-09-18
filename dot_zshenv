@@ -4,12 +4,11 @@
 # $XDG_CONFIG_HOME/zsh, apa pun yang di-set oleh /etc/zshenv, terminal
 # emulator, atau environment warisan dari sesi lama.
 #
-# Tanpa ini, zsh nyari .zshrc di tempat yang salah dan config-mu
-# diam-diam nggak pernah kebaca.
+# Di Linux (Ubuntu/Arch) /etc/zsh/zshenv sudah mengeset ZDOTDIR, jadi file ini
+# yang dieksekusi. Di macOS/WSL, ZDOTDIR belum tentu di-set → file ini yang
+# jadi entry point. Isinya sengaja sama dengan ~/.config/zsh/.zshenv.
 
-export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
-export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
-export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
-export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
-
-export ZDOTDIR="$XDG_CONFIG_HOME/zsh"
+if [[ -z ${ZDOTDIR:-} ]]; then
+  export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+  export ZDOTDIR="$XDG_CONFIG_HOME/zsh"
+fi

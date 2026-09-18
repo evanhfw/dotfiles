@@ -9,6 +9,15 @@
 # Jumlah file dihitung saat direktori benar-benar dibuka, jadi nggak bikin lemot.
 linemode = "size"
 
+# show_hidden = T (yazi default) — dibiarkan eksplisit biar nggak "hilang" saat
+# yazi ganti default di versi mendatang.
+show_hidden = true
+
+# Urut natural: "file2" sebelum "file10" (bukan ASCII sort).
+sort_by = "natural"
+sort_sensitive = false
+sort_dir_first = true
+
 [opener]
 # Eksplisit nvim, nggak bergantung $EDITOR. Default yazi pakai
 # `${EDITOR:-vi}` — kalau $EDITOR kosong, `Enter` di file teks buka vim.

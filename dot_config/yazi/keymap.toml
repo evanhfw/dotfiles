@@ -1,0 +1,7 @@
+[manager]
+prepend_keymap = [
+  { on = [ "." ], run = "hidden toggle", desc = "Toggle hidden" },
+  { on = [ "g", "h" ], run = "cd ~", desc = "Go home" },
+  { on = [ "g", "c" ], run = "cd ~/.config", desc = "Go config" },
+  { on = [ "g", "p" ], run = "cd ~/projects", desc = "Go projects" },
+]
