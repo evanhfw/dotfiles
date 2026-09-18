@@ -1,7 +1,19 @@
 #!/usr/bin/env bash
 # install paket dasar + CLI tools.
 # run_onchange: jalan lagi otomatis kalau isi script ini berubah.
-set -euo pipefail
+#
+# retry: 1   <- naikkan angka ini untuk MEMAKSA script jalan lagi
+#              (mis. kalau tadi gagal karena jaringan)
+#
+# Sengaja TIDAK pakai `set -e`: gagal pasang satu paket (WiFi blip, mirror
+# down) nggak boleh menggagalkan `chezmoi apply`, karena itu bikin file
+# config nggak ke-apply sama sekali. Kegagalan cukup di-warn.
+set -uo pipefail
+
+warn_retry() {
+  echo "!! ada paket gagal dipasang (cek koneksi). Naikkan angka di baris"
+  echo "   '# retry:' di file sumber, lalu jalankan: chezmoi apply"
+}
 
 echo "==> install paket"
 
@@ -12,29 +24,29 @@ brew install \
   neovim ripgrep fd fzf lazygit tree-sitter-cli node \
   starship zsh-autosuggestions zsh-syntax-highlighting zsh-completions \
   zoxide eza bat direnv \
-  mise tmux sesh herdr
+  mise tmux sesh herdr || warn_retry
 
 {{- else if eq .chezmoi.os "linux" }}
 
 if command -v apt-get >/dev/null; then
   sudo apt-get update -qq
-  sudo apt-get install -y zsh neovim ripgrep fzf tmux build-essential git curl unzip nodejs npm
+  sudo apt-get install -y zsh neovim ripgrep fzf tmux build-essential git curl unzip nodejs npm || warn_retry
   # opsional: nggak semua distro punya → jangan gagalkan script
   sudo apt-get install -y zsh-autosuggestions zsh-syntax-highlighting zsh-completions \
     zoxide direnv bat fd-find eza || true
 elif command -v dnf >/dev/null; then
-  sudo dnf install -y zsh neovim ripgrep fzf tmux gcc make git curl unzip nodejs npm
+  sudo dnf install -y zsh neovim ripgrep fzf tmux gcc make git curl unzip nodejs npm || warn_retry
   sudo dnf install -y zsh-autosuggestions zsh-syntax-highlighting zoxide direnv bat fd-find eza || true
 elif command -v pacman >/dev/null; then
-  sudo pacman -S --needed --noconfirm zsh neovim ripgrep fzf tmux base-devel git curl unzip nodejs npm
+  sudo pacman -S --needed --noconfirm zsh neovim ripgrep fzf tmux base-devel git curl unzip nodejs npm || warn_retry
   sudo pacman -S --needed --noconfirm zsh-autosuggestions zsh-syntax-highlighting zoxide direnv bat fd eza || true
 else
-  echo "!! package manager tak dikenal — install manual: zsh neovim ripgrep fd fzf tmux gcc git node starship zoxide eza mise uv"
+  echo "!! package manager tak dikenal — install manual: zsh neovim ripgrep fd fzf tmux gcc git node starship zoxide eza mise"
 fi
 
 # starship, mise nggak ada di apt/dnf/pacman
-command -v starship >/dev/null || curl -fsSL https://starship.rs/install.sh | sh -s -- -y
-command -v mise     >/dev/null || curl -fsSL https://mise.run | sh
+command -v starship >/dev/null || curl -fsSL https://starship.rs/install.sh | sh -s -- -y || warn_retry
+command -v mise     >/dev/null || curl -fsSL https://mise.run | sh || warn_retry
 # uv diurus mise (lihat dot_config/mise/config.toml) — jangan pasang dobel
 # herdr & sesh belum ada paket Linux — install manual kalau butuh
 
