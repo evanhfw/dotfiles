@@ -12,6 +12,9 @@ name = "terminal"
 panel_bg = "black"
 
 [terminal]
+# Pane herdr spawn pakai $SHELL dari proses server. Server bisa diwarisi
+# bash dari sesi lama → pane jadi bash. Set eksplisit per-OS.
+default_shell = "{{ if eq .chezmoi.os "darwin" }}/bin/zsh{{ else }}/usr/bin/zsh{{ end }}"
 # Matches -c "#{pane_current_path}" on every split, window, and session
 new_cwd = "follow"
 
