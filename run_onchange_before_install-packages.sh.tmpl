@@ -50,6 +50,20 @@ run_root() {
   fi
 }
 
+# Sama seperti run_root, tapi hanya memperingatkan kalau memang BENAR-BENAR
+# gagal. Kalau gagalnya cuma karena sudo tidak tersedia, jangan bilang gagal —
+# pesan "cek koneksi" untuk kasus skip itu menyesatkan.
+install_pkgs() {
+  if run_root "$@"; then
+    return 0
+  fi
+  if [ -n "$SUDO" ]; then
+    warn_retry
+    return 1
+  fi
+  return 0
+}
+
 echo "==> install paket"
 
 {{- if eq .chezmoi.os "darwin" }}
@@ -68,18 +82,18 @@ if command -v apt-get >/dev/null; then
   # Blok fallback tarball di bawah yang memasang versi terbaru ke ~/.local.
   # `apt install neovim` justru menaruh versi tua di /usr/bin dan menang di PATH.
   run_root apt-get update -qq
-  run_root apt-get install -y zsh ripgrep fzf build-essential git curl unzip file nodejs npm || warn_retry
+  install_pkgs apt-get install -y zsh ripgrep fzf build-essential git curl unzip file nodejs npm
   opt_mgr=apt
   # zsh-completions NGGAK ADA di Ubuntu (dicek via Launchpad API) — jangan dipaksa.
   # Completion Debian datang dari zsh-common → /usr/share/zsh/vendor-completions,
   # dan .zshrc sudah mencari folder itu.
   opt_pkgs="zsh-autosuggestions zsh-syntax-highlighting zoxide direnv bat fd-find eza"
 elif command -v dnf >/dev/null; then
-  run_root dnf install -y zsh ripgrep fzf gcc make git curl unzip file nodejs npm || warn_retry
+  install_pkgs dnf install -y zsh ripgrep fzf gcc make git curl unzip file nodejs npm
   opt_mgr=dnf
   opt_pkgs="zsh-autosuggestions zsh-syntax-highlighting zoxide direnv bat fd-find eza"
 elif command -v pacman >/dev/null; then
-  run_root pacman -S --needed --noconfirm zsh ripgrep fzf base-devel git curl unzip file nodejs npm || warn_retry
+  install_pkgs pacman -S --needed --noconfirm zsh ripgrep fzf base-devel git curl unzip file nodejs npm
   opt_mgr=pacman
   # Arch punya semuanya di [extra] (diverifikasi via API archlinux.org)
   opt_pkgs="zsh-autosuggestions zsh-syntax-highlighting zsh-completions zoxide direnv bat fd eza yazi lazygit mise starship"
@@ -94,16 +108,42 @@ fi
 # nggak dikenal. Jadi batch = satu nama salah, semua ikut gagal.
 # Contoh nyata: `zsh-completions` nggak ada di Ubuntu → eza/fd/bat/zoxide
 # sebenarnya kepasang semua nggak. Diam-diam aja.
+#
+# Lewati paket yang sudah terpasang supaya output tidak penuh dan tidak ada
+# baris "gagal" palsu. Ini penting karena `run_root` SENGAJA return 1 saat sudo
+# tidak tersedia — tanpa cek ini, paket yang sudah ada ikut dilaporkan gagal.
+#
+# Cek lewat MANAJER PAKET, bukan `command -v`: plugin zsh (autosuggest,
+# syntax-highlighting) tidak punya biner, dan `fd-find` binernya bernama `fd`.
+pkg_installed() {
+  case "$opt_mgr" in
+    apt)    dpkg -s "$1" >/dev/null 2>&1 ;;
+    dnf)    rpm -q "$1" >/dev/null 2>&1 ;;
+    pacman) pacman -Q "$1" >/dev/null 2>&1 ;;
+    *)      return 1 ;;
+  esac
+}
+
 if [ -n "$opt_mgr" ]; then
   for p in $opt_pkgs; do
-    # Output TIDAK dibungkam: kalau gagal, user harus tahu paket apa yang
-    # hilang. Sebelumnya di-redirect ke /dev/null sehingga zsh-autosuggestions
-    # yang gagal cuma kelihatan sebagai "diam-diam nggak jalan".
+    if pkg_installed "$p"; then
+      echo "   (sudah ada: $p)"
+      continue
+    fi
+    rc=0
     case "$opt_mgr" in
-      apt)    run_root apt-get install -y "$p" || echo "   (opsional, gagal/tidak ada di repo: $p)" ;;
-      dnf)    run_root dnf install -y "$p" || echo "   (opsional, gagal/tidak ada di repo: $p)" ;;
-      pacman) run_root pacman -S --needed --noconfirm "$p" || echo "   (opsional, gagal/tidak ada di repo: $p)" ;;
+      apt)    run_root apt-get install -y "$p" || rc=$? ;;
+      dnf)    run_root dnf install -y "$p" || rc=$? ;;
+      pacman) run_root pacman -S --needed --noconfirm "$p" || rc=$? ;;
     esac
+    if [ "$rc" -ne 0 ]; then
+      # Bedakan "butuh root" dari "paket tidak ada", jangan disamakan.
+      if [ -z "$SUDO" ]; then
+        echo "   (skip, butuh root: $p)"
+      else
+        echo "   (opsional, gagal/tidak ada di repo: $p)"
+      fi
+    fi
   done
 fi
 
@@ -178,18 +218,29 @@ fi
 # bukan /bin/zsh, dan chsh-nya minta password.
 if [ "$(uname -s)" = "Linux" ] && command -v zsh >/dev/null 2>&1; then
   zsh_bin="$(command -v zsh)"
-  if [ "${SHELL:-}" != "$zsh_bin" ]; then
+
+  # Cek login shell SEBENARNYA dari /etc/passwd, JANGAN dari $SHELL.
+  # $SHELL itu env warisan dari proses induk — kalau `chezmoi apply` dijalankan
+  # dari bash, $SHELL=/usr/bin/bash padahal login shell-nya sudah zsh. Akibatnya
+  # chsh dijalankan tanpa perlu → prompt "Password:" muncul di tengah apply,
+  # dan di konteks non-TTY langsung gagal dengan 'PAM: Authentication failure'.
+  login_shell="$(getent passwd "$(id -un)" 2>/dev/null | cut -d: -f7)"
+  [ -z "$login_shell" ] && login_shell="${SHELL:-}"
+
+  if [ "$login_shell" != "$zsh_bin" ]; then
     # chsh untuk akun sendiri tidak butuh root — dia minta password sendiri
     # via PAM. Di terminal itu wajar; di konteks non-TTY dia gagal, dan itu
     # lebih baik daripada hang. Kalau sudo sudah ter-cache, pakai itu supaya
     # tidak prompt sama sekali.
     if [ -n "$SUDO" ]; then
-      $SUDO grep -qx "$zsh_bin" /etc/shells 2>/dev/null || echo "$zsh_bin" | $SUDO tee -a /etc/shells >/dev/null
-      $SUDO chsh -s "$zsh_bin" "$USER" || echo "!! chsh gagal — jalankan manual: chsh -s $zsh_bin"
+      grep -qx "$zsh_bin" /etc/shells 2>/dev/null || echo "$zsh_bin" | $SUDO tee -a /etc/shells >/dev/null
+      $SUDO chsh -s "$zsh_bin" "$(id -un)" || echo "!! chsh gagal — jalankan manual: chsh -s $zsh_bin"
     else
       grep -qx "$zsh_bin" /etc/shells 2>/dev/null || echo "   (perlu root: echo $zsh_bin >> /etc/shells)"
       chsh -s "$zsh_bin" || echo "!! chsh gagal — jalankan manual: chsh -s $zsh_bin"
     fi
+  else
+    echo "==> login shell sudah zsh ($login_shell), skip chsh"
   fi
 fi
 
