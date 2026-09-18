@@ -11,28 +11,32 @@ command -v brew >/dev/null || { echo "Homebrew belum ada → https://brew.sh"; e
 brew install \
   neovim ripgrep fd fzf lazygit tree-sitter-cli node \
   starship zsh-autosuggestions zsh-syntax-highlighting zsh-completions \
-  zoxide eza bat direnv
+  zoxide eza bat direnv \
+  mise uv tmux sesh herdr
 
 {{- else if eq .chezmoi.os "linux" }}
 
 if command -v apt-get >/dev/null; then
   sudo apt-get update -qq
-  sudo apt-get install -y zsh neovim ripgrep fzf build-essential git curl unzip nodejs npm
+  sudo apt-get install -y zsh neovim ripgrep fzf tmux build-essential git curl unzip nodejs npm
   # opsional: nggak semua distro punya → jangan gagalkan script
   sudo apt-get install -y zsh-autosuggestions zsh-syntax-highlighting zsh-completions \
     zoxide direnv bat fd-find eza || true
 elif command -v dnf >/dev/null; then
-  sudo dnf install -y zsh neovim ripgrep fzf gcc make git curl unzip nodejs npm
+  sudo dnf install -y zsh neovim ripgrep fzf tmux gcc make git curl unzip nodejs npm
   sudo dnf install -y zsh-autosuggestions zsh-syntax-highlighting zoxide direnv bat fd-find eza || true
 elif command -v pacman >/dev/null; then
-  sudo pacman -S --needed --noconfirm zsh neovim ripgrep fzf base-devel git curl unzip nodejs npm
+  sudo pacman -S --needed --noconfirm zsh neovim ripgrep fzf tmux base-devel git curl unzip nodejs npm
   sudo pacman -S --needed --noconfirm zsh-autosuggestions zsh-syntax-highlighting zoxide direnv bat fd eza || true
 else
-  echo "!! package manager tak dikenal — install manual: zsh neovim ripgrep fd fzf gcc git node starship zoxide eza"
+  echo "!! package manager tak dikenal — install manual: zsh neovim ripgrep fd fzf tmux gcc git node starship zoxide eza mise uv"
 fi
 
-# starship nggak ada di apt/dnf/pacman
+# starship, mise, uv nggak ada di apt/dnf/pacman
 command -v starship >/dev/null || curl -fsSL https://starship.rs/install.sh | sh -s -- -y
+command -v mise     >/dev/null || curl -fsSL https://mise.run | sh
+command -v uv       >/dev/null || curl -LsSf https://astral.sh/uv/install.sh | sh
+# herdr & sesh belum ada paket Linux — install manual kalau butuh
 
 {{- end }}
 
@@ -49,6 +53,9 @@ fi
 
 # --- tree-sitter CLI (dipakai nvim-treesitter/mason) -------------------------
 command -v tree-sitter >/dev/null 2>&1 || npm i -g tree-sitter-cli || echo "tree-sitter-cli (opsional) gagal"
+
+# --- pi coding agent (npm global) -------------------------------------------
+command -v pi >/dev/null 2>&1 || npm i -g @earendil-works/pi-coding-agent || echo "!! pi gagal diinstall"
 
 # --- fallback: neovim repo < 0.9 di Linux (mis. Ubuntu 22.04) ---------------
 if [ "$(uname -s)" = "Linux" ]; then

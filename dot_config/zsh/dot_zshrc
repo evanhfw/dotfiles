@@ -38,6 +38,12 @@ if command -v eza >/dev/null 2>&1; then
   alias lt='eza --tree --level=2 --icons'
 fi
 
+# --- mise (version manager: bun, node, pnpm, rust, uv) ----------------------
+# Shims ditaruh di PATH supaya tool-nya kebaca JUGA oleh proses non-interaktif
+# (editor, LSP, agen). activate = auto-switch versi saat cd.
+[[ -d "$HOME/.local/share/mise/shims" ]] && export PATH="$HOME/.local/share/mise/shims:$PATH"
+command -v mise >/dev/null 2>&1 && eval "$(mise activate zsh)"
+
 # --- tools ------------------------------------------------------------------
 command -v zoxide >/dev/null 2>&1 && eval "$(zoxide init zsh)"
 command -v direnv >/dev/null 2>&1 && eval "$(direnv hook zsh)"

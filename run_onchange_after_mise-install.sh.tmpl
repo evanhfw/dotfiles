@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# run_onchange: pasang tool mise sesuai ~/.config/mise/config.toml
+# hash: {{ include "dot_config/mise/config.toml" | sha256sum }}
+#
+# 'after' karena config.toml-nya baru ada setelah chezmoi apply.
+set -euo pipefail
+
+if ! command -v mise >/dev/null; then
+  echo "==> mise belum ada, skip"
+  exit 0
+fi
+
+echo "==> mise install (bun, node, pnpm, rust, uv)"
+mise install
+echo "==> mise selesai"
