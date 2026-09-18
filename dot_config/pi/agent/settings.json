@@ -1,12 +1,16 @@
 {
-  "lastChangelogVersion": "0.84.1",
+  "lastChangelogVersion": "0.84.2",
   "theme": "dark",
   "packages": [
-    "npm:pi-9router-ext",
-    "git:github.com/evanhfw/pi-omniroute"
+    "npm:@llblab/pi-telegram",
+    "npm:pi-interactive-shell",
+    "npm:pi-mcp-adapter",
+    "https://github.com/evanhfw/pi-omniroute",
+    "npm:@ff-labs/pi-fff",
+    "npm:@getpipher/vision"
   ],
   "defaultProvider": "omni",
-  "defaultModel": "sumopod/deepseek-v4-flash",
+  "defaultModel": "cmd/deepseek/deepseek-v4.1-flash",
   "defaultThinkingLevel": "high",
   "hideThinkingBlock": true
 }

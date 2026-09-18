@@ -41,10 +41,10 @@ focus_pane_right = ["ctrl+alt+l", "ctrl+alt+right"]
 resize_mode = ["prefix+ctrl+left", "prefix+ctrl+down", "prefix+ctrl+up", "prefix+ctrl+right"]
 
 # Like resize-pane on C-M-S-arrows
-resize_pane_left = "ctrl+alt+shift+h"
-resize_pane_down = "ctrl+alt+shift+j"
-resize_pane_up = "ctrl+alt+shift+k"
-resize_pane_right = "ctrl+alt+shift+l"
+resize_pane_left = ["ctrl+alt+shift+h", "ctrl+alt+shift+left"]
+resize_pane_down = ["ctrl+alt+shift+j", "ctrl+alt+shift+down"]
+resize_pane_up = ["ctrl+alt+shift+k", "ctrl+alt+shift+up"]
+resize_pane_right = ["ctrl+alt+shift+l", "ctrl+alt+shift+right"]
 
 # No tmux equivalent; herdr's default prefix+shift+p is taken by previous session
 rename_pane = "prefix+shift+o"

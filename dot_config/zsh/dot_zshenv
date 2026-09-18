@@ -1,0 +1,27 @@
+# ~/.config/zsh/.zshenv — dibaca zsh PALING AWAL, untuk SETIAP invocation.
+#
+# Di Linux (Ubuntu/Arch), /etc/zsh/zshenv sudah mengeset ZDOTDIR ke sini, jadi
+# file INILAH yang benar-benar dieksekusi. ~/.zshenv (di root home) hanya
+# dibaca saat ZDOTDIR belum di-set — mis. macOS/WSL.
+#
+# Tugasnya: kunci semua direktori XDG supaya konsisten di ketiga mesin.
+
+export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
+export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
+export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
+
+# Cargo/rustup dipindah ke XDG (bukan ~/.cargo, ~/.rustup).
+export CARGO_HOME="${CARGO_HOME:-$XDG_CONFIG_HOME/cargo}"
+export RUSTUP_HOME="${RUSTUP_HOME:-$XDG_CONFIG_HOME/rustup}"
+
+# urn: pi & claude baca config dari XDG.
+export PI_CODING_AGENT_DIR="${PI_CODING_AGENT_DIR:-$XDG_CONFIG_HOME/pi/agent}"
+export CLAUDE_CONFIG_DIR="${CLAUDE_CONFIG_DIR:-$XDG_CONFIG_HOME/claude}"
+
+# cargo env HARUS di-source dari sini (bukan .zshrc): non-interactive shell
+# (editor, LSP, agen, `ssh host cmd`) juga butuh cargo di PATH.
+[[ -f "$CARGO_HOME/env" ]] && . "$CARGO_HOME/env"
+
+# ZDOTDIR dikunci TERAKHIR — supaya .zshrc selalu ketemu di XDG.
+export ZDOTDIR="$XDG_CONFIG_HOME/zsh"

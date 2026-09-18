@@ -29,19 +29,22 @@ brew install \
 {{- else if eq .chezmoi.os "linux" }}
 
 if command -v apt-get >/dev/null; then
+  # neovim SENGAJA tidak di sini: repo Ubuntu sering ketinggalan (0.9.x).
+  # Blok fallback tarball di bawah yang memasang versi terbaru ke ~/.local.
+  # `apt install neovim` justru menaruh versi tua di /usr/bin dan menang di PATH.
   sudo apt-get update -qq
-  sudo apt-get install -y zsh neovim ripgrep fzf build-essential git curl unzip file nodejs npm || warn_retry
+  sudo apt-get install -y zsh ripgrep fzf build-essential git curl unzip file nodejs npm || warn_retry
   opt_mgr=apt
   # zsh-completions NGGAK ADA di Ubuntu (dicek via Launchpad API) — jangan dipaksa.
   # Completion Debian datang dari zsh-common → /usr/share/zsh/vendor-completions,
   # dan .zshrc sudah mencari folder itu.
   opt_pkgs="zsh-autosuggestions zsh-syntax-highlighting zoxide direnv bat fd-find eza"
 elif command -v dnf >/dev/null; then
-  sudo dnf install -y zsh neovim ripgrep fzf gcc make git curl unzip file nodejs npm || warn_retry
+  sudo dnf install -y zsh ripgrep fzf gcc make git curl unzip file nodejs npm || warn_retry
   opt_mgr=dnf
   opt_pkgs="zsh-autosuggestions zsh-syntax-highlighting zoxide direnv bat fd-find eza"
 elif command -v pacman >/dev/null; then
-  sudo pacman -S --needed --noconfirm zsh neovim ripgrep fzf base-devel git curl unzip file nodejs npm || warn_retry
+  sudo pacman -S --needed --noconfirm zsh ripgrep fzf base-devel git curl unzip file nodejs npm || warn_retry
   opt_mgr=pacman
   # Arch punya semuanya di [extra] (diverifikasi via API archlinux.org)
   opt_pkgs="zsh-autosuggestions zsh-syntax-highlighting zsh-completions zoxide direnv bat fd eza yazi lazygit mise starship"
@@ -159,28 +162,34 @@ command -v pi >/dev/null 2>&1 ||
   npm i -g --prefix "$npm_pfx" @earendil-works/pi-coding-agent ||
   echo "!! pi gagal diinstall"
 
-# --- fallback: neovim repo < 0.9 di Linux (mis. Ubuntu 22.04) ---------------
+# --- neovim: pasang/upgrade ke ~/.local (jangan lewat apt) ------------------
+# Kenapa ~/.local: `.local/bin` ada di depan PATH (lihat .zshrc), jadi menang
+# atas /usr/bin/nvim bawaan distro. LazyVim butuh nvim >= 0.10; repo Ubuntu
+# sering masih 0.9.x. Di macOS/Arch ini nggak jalan (brew/pacman sudah baru).
 if [ "$(uname -s)" = "Linux" ]; then
+  nvim_need_install=0
   if command -v nvim >/dev/null; then
     ver="$(nvim --version | head -1 | sed 's/^NVIM v//')"
+    maj="${ver%%.*}"
+    min="$(printf '%s' "$ver" | cut -d. -f2)"
+    # < 0.10 → terlalu tua buat LazyVim.
+    if [ "${maj:-0}" -eq 0 ] && [ "${min:-0}" -lt 10 ]; then nvim_need_install=1; fi
   else
-    ver="0"
+    nvim_need_install=1
   fi
-  maj="${ver%%.*}"
-  min="$(printf '%s' "$ver" | cut -d. -f2)"
-  if [ "$maj" -eq 0 ] && [ "${min:-0}" -lt 9 ]; then
-    arch=x86_64
-    case "$(uname -m)" in aarch64|arm64) arch=arm64 ;; esac
-    tmp="$(mktemp -d)"
-    echo "==> neovim terlalu tua, download tarball ($arch) → ~/.local"
-    curl -fL "https://github.com/neovim/neovim/releases/latest/download/nvim-linux-${arch}.tar.gz" | tar -xz -C "$tmp"
-    mkdir -p "$HOME/.local/bin"
-    cp -R "$tmp/nvim-linux-${arch}/." "$HOME/.local/"
-    rm -rf "$tmp"
-    case ":$PATH:" in
-      *":$HOME/.local/bin:"*) ;;
-      *) echo "!! tambah ke shell rc:  export PATH=\"\$HOME/.local/bin:\$PATH\"" ;;
-    esac
+  if [ "$nvim_need_install" -eq 1 ]; then
+    nv_arch=x86_64
+    case "$(uname -m)" in aarch64|arm64) nv_arch=arm64 ;; esac
+    nv_tmp="$(mktemp -d)"
+    echo "==> neovim: unduh tarball terbaru ($nv_arch) → ~/.local"
+    if curl -fL "https://github.com/neovim/neovim/releases/latest/download/nvim-linux-${nv_arch}.tar.gz" | tar -xz -C "$nv_tmp"; then
+      mkdir -p "$HOME/.local/bin"
+      cp -R "$nv_tmp/nvim-linux-${nv_arch}/." "$HOME/.local/"
+      echo "==> neovim $("$HOME/.local/bin/nvim" --version | head -1)"
+    else
+      echo "!! neovim gagal diunduh"
+    fi
+    rm -rf "$nv_tmp"
   fi
 fi
 
