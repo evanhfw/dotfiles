@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+# run_once: install paket yang dibutuhkan neovim
+set -euo pipefail
+
+echo "==> install paket"
+
+{{- if eq .chezmoi.os "darwin" }}
+command -v brew >/dev/null || { echo "Homebrew belum ada → https://brew.sh"; exit 1; }
+brew install neovim ripgrep fd fzf lazygit tree-sitter-cli node
+{{- else if eq .chezmoi.os "linux" }}
+if command -v apt-get >/dev/null; then
+  sudo apt-get update -qq
+  sudo apt-get install -y neovim ripgrep fd-find fzf build-essential git curl unzip nodejs npm
+elif command -v dnf >/dev/null; then
+  sudo dnf install -y neovim ripgrep fd-find fzf gcc make git curl unzip nodejs npm
+elif command -v pacman >/dev/null; then
+  sudo pacman -S --needed --noconfirm neovim ripgrep fd fzf base-devel git curl unzip nodejs npm
+else
+  echo "package manager tak dikenal — install manual: neovim>=0.9 ripgrep fd fzf gcc git node"
+fi
+
+command -v tree-sitter >/dev/null 2>&1 || npm i -g tree-sitter-cli || echo "tree-sitter-cli (opsional) gagal"
+
+# fallback: neovim repo masih < 0.9 (mis. Ubuntu 22.04)
+if command -v nvim >/dev/null; then
+  ver="$(nvim --version | head -1 | sed 's/^NVIM v//')"
+else
+  ver="0"
+fi
+maj="${ver%%.*}"
+min="$(printf '%s' "$ver" | cut -d. -f2)"
+if [ "$maj" -eq 0 ] && [ "${min:-0}" -lt 9 ]; then
+  arch=x86_64
+  case "$(uname -m)" in aarch64|arm64) arch=arm64 ;; esac
+  tmp="$(mktemp -d)"
+  echo "==> neovim terlalu tua, download tarball ($arch) → ~/.local"
+  curl -fL "https://github.com/neovim/neovim/releases/latest/download/nvim-linux-${arch}.tar.gz" | tar -xz -C "$tmp"
+  mkdir -p "$HOME/.local/bin"
+  cp -R "$tmp/nvim-linux-${arch}/." "$HOME/.local/"
+  rm -rf "$tmp"
+  case ":$PATH:" in
+    *":$HOME/.local/bin:"*) ;;
+    *) echo "!! tambah ke shell rc:  export PATH=\"\$HOME/.local/bin:\$PATH\"" ;;
+  esac
+fi
+{{- end }}
+
+echo "==> paket selesai"

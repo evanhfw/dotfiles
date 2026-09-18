@@ -1,0 +1,12 @@
+{
+  "lastChangelogVersion": "0.84.1",
+  "theme": "dark",
+  "packages": [
+    "npm:pi-9router-ext",
+    "git:github.com/evanhfw/pi-omniroute"
+  ],
+  "defaultProvider": "omni",
+  "defaultModel": "sumopod/deepseek-v4-flash",
+  "defaultThinkingLevel": "high",
+  "hideThinkingBlock": true
+}

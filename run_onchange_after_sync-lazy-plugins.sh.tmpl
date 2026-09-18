@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# run_onchange: install/sync plugin LazyVim saat lazy-lock.json berubah
+# hash: {{ include "dot_config/nvim/lazy-lock.json" | sha256sum }}
+set -euo pipefail
+
+if ! command -v nvim >/dev/null; then
+  echo "==> nvim belum ada, skip sync plugin"
+  exit 0
+fi
+
+echo "==> sync plugin LazyVim (headless, 1-3 menit)"
+nvim --headless "+Lazy! sync" +qa
+echo "==> plugin selesai"
