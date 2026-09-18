@@ -1,5 +1,11 @@
 [user]
 	name = Evan Hanif Widiatama
 	email = 121467356+evanhfw@users.noreply.github.com
+[init]
+	defaultBranch = main
 [fetch]
 	prune = true
+[pull]
+	rebase = false
+[push]
+	autoSetupRemote = true
