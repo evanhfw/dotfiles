@@ -3,12 +3,22 @@
 # File yang HARUS dihapus dari home saat apply. Jalan sekali per entri lalu
 # dicatat di state chezmoi, jadi nggak akan "menghapus ulang" tiap apply.
 #
-# Riwayat: setup ini dulu pakai tmux. Sekarang pakai herdr (config di
-# dot_config/herdr/config.toml). Sisa file tmux dibersihkan dari ketiga mesin.
+# Kenapa perlu: chezmoi TIDAK menghapus file yang berhenti dikelola. Kalau
+# sebuah file dihapus dari source dir, salinannya di home tetap tertinggal
+# dan tetap aktif (mis. spec plugin nvim tetap di-load lazy.nvim).
+# Daftar di sini = satu-satunya cara membersihkannya dari mesin lama.
 
 {{ if ne .chezmoi.os "windows" -}}
+# tmux: setup lama, sekarang herdr (dot_config/herdr/config.toml).
 .tmux.conf
 .config/tmux
 .local/share/tmux
 .config/nvim/lua/plugins/tmux.lua
+
+# Scaffold LazyVim: contoh bawaan, isinya cuma `if true then return {} end`
+# (dead code) dan spec plugin yang sudah tidak dipakai.
+.config/nvim/LICENSE
+.config/nvim/README.md
+.config/nvim/lua/plugins/example.lua
+.config/nvim/lua/plugins/vim-be-good.lua
 {{- end }}
