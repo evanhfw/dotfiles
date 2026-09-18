@@ -30,6 +30,13 @@ autoload -Uz compinit && compinit -i
 zstyle ':completion:*' menu select
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
 
+# --- carapace (completion buat ~1000 CLI) -----------------------------------
+# Harus SETELAH compinit, SEBELUM zsh-syntax-highlighting.
+if command -v carapace >/dev/null 2>&1; then
+  zstyle ':completion:*' format $'\e[2;37mCompleting %d\e[m'
+  source <(carapace _carapace zsh)
+fi
+
 # --- ls/ll → eza ------------------------------------------------------------
 if command -v eza >/dev/null 2>&1; then
   alias ls='eza --icons --group-directories-first'
@@ -38,6 +45,11 @@ if command -v eza >/dev/null 2>&1; then
   alias lt='eza --tree --level=2 --icons'
 fi
 
+# --- cat → bat ---------------------------------------------------------------
+# --paging=never: `cat file` nggak nyangkut di pager.
+# Kalau output dipipe, bat otomatis matiin warna → aman buat `cat x | grep y`.
+command -v bat >/dev/null 2>&1 && alias cat='bat --style=plain --paging=never'
+
 # --- mise (version manager: bun, node, pnpm, rust, uv) ----------------------
 # Shims ditaruh di PATH supaya tool-nya kebaca JUGA oleh proses non-interaktif
 # (editor, LSP, agen). activate = auto-switch versi saat cd.
@@ -45,9 +57,28 @@ fi
 command -v mise >/dev/null 2>&1 && eval "$(mise activate zsh)"
 
 # --- tools ------------------------------------------------------------------
-command -v zoxide >/dev/null 2>&1 && eval "$(zoxide init zsh)"
+# --cmd cd: `cd` jadi sadar-frekuensi. Path biasa tetap jalan seperti biasa
+# (zoxide fallback ke builtin cd), plus bisa loncat: `cd proj` → ~/work/proj.
+# Yang interaktif jadi `cdi`.
+command -v zoxide >/dev/null 2>&1 && eval "$(zoxide init zsh --cmd cd)"
 command -v direnv >/dev/null 2>&1 && eval "$(direnv hook zsh)"
 command -v fzf    >/dev/null 2>&1 && source <(fzf --zsh)
+# herdr punya completion sendiri (bukan di carapace) — harus setelah compinit.
+command -v herdr  >/dev/null 2>&1 && source <(herdr completion zsh)
+
+# --- yazi (file manager) ----------------------------------------------------
+# Pakai fungsi, bukan alias biasa: setelah keluar, shell ikut pindah ke
+# direktori terakhir yang kamu lihat di yazi.
+if command -v yazi >/dev/null 2>&1; then
+  y() {
+    local tmp cwd
+    tmp="$(mktemp -t yazi-cwd.XXXXXX)" || return 1
+    yazi "$@" --cwd-file="$tmp"
+    IFS= read -r cwd < "$tmp"
+    [ -n "$cwd" ] && [ "$cwd" != "$PWD" ] && builtin cd -- "$cwd"
+    rm -f -- "$tmp"
+  }
+fi
 
 # --- zsh plugins (urutan penting) -------------------------------------------
 source_zsh_plugin() {

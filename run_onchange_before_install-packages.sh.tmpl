@@ -23,32 +23,63 @@ command -v brew >/dev/null || { echo "Homebrew belum ada → https://brew.sh"; e
 brew install \
   neovim ripgrep fd fzf lazygit tree-sitter-cli node \
   starship zsh-autosuggestions zsh-syntax-highlighting zsh-completions \
-  zoxide eza bat direnv \
-  mise tmux sesh herdr || warn_retry
+  zoxide eza bat direnv carapace yazi \
+  mise herdr || warn_retry
 
 {{- else if eq .chezmoi.os "linux" }}
 
 if command -v apt-get >/dev/null; then
   sudo apt-get update -qq
-  sudo apt-get install -y zsh neovim ripgrep fzf tmux build-essential git curl unzip nodejs npm || warn_retry
+  sudo apt-get install -y zsh neovim ripgrep fzf build-essential git curl unzip nodejs npm || warn_retry
   # opsional: nggak semua distro punya → jangan gagalkan script
-  sudo apt-get install -y zsh-autosuggestions zsh-syntax-highlighting zsh-completions \
+  sudo apt-get install -y zsh-autosuggestions zsh-syntax-highlighting \
     zoxide direnv bat fd-find eza || true
 elif command -v dnf >/dev/null; then
-  sudo dnf install -y zsh neovim ripgrep fzf tmux gcc make git curl unzip nodejs npm || warn_retry
-  sudo dnf install -y zsh-autosuggestions zsh-syntax-highlighting zoxide direnv bat fd-find eza || true
+  sudo dnf install -y zsh neovim ripgrep fzf gcc make git curl unzip nodejs npm || warn_retry
+  sudo dnf install -y zsh-autosuggestions zsh-syntax-highlighting zsh-completions \
+    zoxide direnv bat fd-find eza || true
 elif command -v pacman >/dev/null; then
-  sudo pacman -S --needed --noconfirm zsh neovim ripgrep fzf tmux base-devel git curl unzip nodejs npm || warn_retry
-  sudo pacman -S --needed --noconfirm zsh-autosuggestions zsh-syntax-highlighting zoxide direnv bat fd eza || true
+  sudo pacman -S --needed --noconfirm zsh neovim ripgrep fzf base-devel git curl unzip nodejs npm || warn_retry
+  # Arch punya hampir semuanya di [extra] (diverifikasi via API archlinux.org)
+  sudo pacman -S --needed --noconfirm zsh-autosuggestions zsh-syntax-highlighting zsh-completions \
+    zoxide direnv bat fd eza yazi lazygit mise starship || true
 else
-  echo "!! package manager tak dikenal — install manual: zsh neovim ripgrep fd fzf tmux gcc git node starship zoxide eza mise"
+  echo "!! package manager tak dikenal — install manual: zsh neovim ripgrep fd fzf gcc git node starship zoxide eza mise"
 fi
 
-# starship, mise nggak ada di apt/dnf/pacman
+# --- Debian/Ubuntu rename biner: fd → fdfind, bat → batcat -------------------
+# Tanpa symlink ini: alias `cat`, LazyVim (butuh `fd`), dan preview fzf
+# nggak jalan. Diam-diam gagal, jadi sering nggak ketahuan.
+mkdir -p "$HOME/.local/bin"
+for pair in "fdfind:fd" "batcat:bat"; do
+  src_bin="${pair%%:*}"
+  dst_bin="${pair##*:}"
+  if ! command -v "$dst_bin" >/dev/null 2>&1 && command -v "$src_bin" >/dev/null 2>&1; then
+    ln -sf "$(command -v "$src_bin")" "$HOME/.local/bin/$dst_bin" && echo "==> symlink $src_bin → $dst_bin"
+  fi
+done
+
+# --- lazygit: nggak ada di apt/dnf — ambil tarball rilis resmi --------------
+if ! command -v lazygit >/dev/null 2>&1; then
+  lg_ver="$(curl -fsSL https://api.github.com/repos/jesseduffield/lazygit/releases/latest 2>/dev/null |
+    sed -n 's/.*"tag_name" *: *"v\([^"]*\)".*/\1/p' | head -1)"
+  if [ -n "$lg_ver" ]; then
+    lg_arch=x86_64
+    case "$(uname -m)" in aarch64|arm64) lg_arch=arm64 ;; esac
+    echo "==> lazygit v$lg_ver ($lg_arch)"
+    mkdir -p "$HOME/.local/bin"
+    curl -fL "https://github.com/jesseduffield/lazygit/releases/download/v${lg_ver}/lazygit_${lg_ver}_Linux_${lg_arch}.tar.gz" |
+      tar -xz -C "$HOME/.local/bin" lazygit && echo "==> lazygit terpasang"
+  fi
+fi
+
+# starship & mise: nggak ada di apt/dnf (Arch punya di [extra])
 command -v starship >/dev/null || curl -fsSL https://starship.rs/install.sh | sh -s -- -y || warn_retry
 command -v mise     >/dev/null || curl -fsSL https://mise.run | sh || warn_retry
 # uv diurus mise (lihat dot_config/mise/config.toml) — jangan pasang dobel
-# herdr & sesh belum ada paket Linux — install manual kalau butuh
+# herdr & carapace belum ada di apt/dnf/pacman:
+#   carapace → AUR (carapace-bin) atau https://github.com/carapace-sh/carapace-bin
+#   herdr    → lihat dokumentasi herdr
 
 {{- end }}
 
@@ -92,6 +123,18 @@ if [ "$(uname -s)" = "Linux" ]; then
       *) echo "!! tambah ke shell rc:  export PATH=\"\$HOME/.local/bin:\$PATH\"" ;;
     esac
   fi
+fi
+
+# --- cek akhir: tool mana yang belum ada ------------------------------------
+missing=""
+for b in zsh nvim git rg fd fzf lazygit node npm starship zoxide eza bat direnv carapace yazi mise uv herdr pi; do
+  command -v "$b" >/dev/null 2>&1 || missing="$missing $b"
+done
+if [ -n "$missing" ]; then
+  echo "!! BELUM ADA:$missing"
+  echo "   (sebagian opsional — carapace/herdr belum ada paketnya di sebagian distro)"
+else
+  echo "==> semua tool tersedia"
 fi
 
 echo "==> paket selesai"
