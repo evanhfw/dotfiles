@@ -143,11 +143,21 @@ if [ "$(uname -s)" = "Linux" ] && command -v zsh >/dev/null 2>&1; then
   fi
 fi
 
-# --- tree-sitter CLI (dipakai nvim-treesitter/mason) -------------------------
-command -v tree-sitter >/dev/null 2>&1 || npm i -g tree-sitter-cli || echo "tree-sitter-cli (opsional) gagal"
+# --- paket npm global --------------------------------------------------------
+# WAJIB pakai --prefix "$HOME/.local". Default prefix npm mengikuti node yang
+# sedang aktif: kalau mise, hasilnya jatuh ke
+# ~/.local/share/mise/installs/node/<versi>/lib/node_modules dan binernya
+# NGGAK masuk PATH (mise cuma bikin shim node/npm, bukan shim tiap paket).
+# $HOME/.local/bin dijamin ada di PATH karena ditulis di .zshrc.
+npm_pfx="$HOME/.local"
 
-# --- pi coding agent (npm global) -------------------------------------------
-command -v pi >/dev/null 2>&1 || npm i -g @earendil-works/pi-coding-agent || echo "!! pi gagal diinstall"
+command -v tree-sitter >/dev/null 2>&1 ||
+  npm i -g --prefix "$npm_pfx" tree-sitter-cli ||
+  echo "tree-sitter-cli (opsional) gagal"
+
+command -v pi >/dev/null 2>&1 ||
+  npm i -g --prefix "$npm_pfx" @earendil-works/pi-coding-agent ||
+  echo "!! pi gagal diinstall"
 
 # --- fallback: neovim repo < 0.9 di Linux (mis. Ubuntu 22.04) ---------------
 if [ "$(uname -s)" = "Linux" ]; then

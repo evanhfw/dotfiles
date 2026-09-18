@@ -43,6 +43,20 @@ if command -v carapace >/dev/null 2>&1; then
   source <(carapace _carapace zsh)
 fi
 
+# --- keybinding -------------------------------------------------------------
+# Panah atas/bawah nyari history berdasarkan PREFIX yang sudah kamu ketik,
+# bukan cuma baris terakhir. Jauh lebih kepake dari sekadar Ctrl+R.
+# Ditaruh SEBELUM zsh-syntax-highlighting supaya widget-nya ikut ke-wrap.
+if [[ -o interactive ]]; then
+  autoload -Uz up-line-or-beginning-search down-line-or-beginning-search
+  zle -N up-line-or-beginning-search
+  zle -N down-line-or-beginning-search
+  bindkey '^[[A' up-line-or-beginning-search    # Up
+  bindkey '^[[B' down-line-or-beginning-search  # Down
+  bindkey '^[OA' up-line-or-beginning-search    # Up (mode application)
+  bindkey '^[OB' down-line-or-beginning-search  # Down (mode application)
+fi
+
 # --- ls/ll → eza ------------------------------------------------------------
 if command -v eza >/dev/null 2>&1; then
   alias ls='eza --icons --group-directories-first'
@@ -67,6 +81,24 @@ command -v mise >/dev/null 2>&1 && eval "$(mise activate zsh)"
 # (zoxide fallback ke builtin cd), plus bisa loncat: `cd proj` → ~/work/proj.
 # Yang interaktif jadi `cdi`.
 command -v zoxide >/dev/null 2>&1 && eval "$(zoxide init zsh --cmd cd)"
+
+# AUTO_CD: ketik nama folder langsung pindah, tanpa `cd`.
+# Karena `cd` udah dipegang zoxide, ini ikut jadi frecency-aware.
+setopt AUTO_CD
+
+# --- fzf --------------------------------------------------------------------
+# fd sebagai sumber daftar (cepat, hormati .gitignore), bat sebagai preview.
+if command -v fd >/dev/null 2>&1; then
+  export FZF_DEFAULT_COMMAND='fd --type f --type d --hidden --follow --exclude .git'
+  export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+  export FZF_ALT_C_COMMAND='fd --type d --hidden --follow --exclude .git'
+fi
+export FZF_DEFAULT_OPTS="
+  --height=60% --layout=reverse --border rounded --info=inline
+  --preview 'bat --style=numbers,changes --color=always --line-range=:200 {} 2>/dev/null || eza --tree --level=2 --icons {}'
+  --preview-window 'right:55%:wrap:border-left'
+"
+
 command -v direnv >/dev/null 2>&1 && eval "$(direnv hook zsh)"
 command -v fzf    >/dev/null 2>&1 && source <(fzf --zsh)
 # herdr punya completion sendiri (bukan di carapace) — harus setelah compinit.
