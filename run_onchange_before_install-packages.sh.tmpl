@@ -1,0 +1,78 @@
+#!/usr/bin/env bash
+# install paket dasar + CLI tools.
+# run_onchange: jalan lagi otomatis kalau isi script ini berubah.
+set -euo pipefail
+
+echo "==> install paket"
+
+{{- if eq .chezmoi.os "darwin" }}
+
+command -v brew >/dev/null || { echo "Homebrew belum ada → https://brew.sh"; exit 1; }
+brew install \
+  neovim ripgrep fd fzf lazygit tree-sitter-cli node \
+  starship zsh-autosuggestions zsh-syntax-highlighting zsh-completions \
+  zoxide eza bat direnv
+
+{{- else if eq .chezmoi.os "linux" }}
+
+if command -v apt-get >/dev/null; then
+  sudo apt-get update -qq
+  sudo apt-get install -y zsh neovim ripgrep fzf build-essential git curl unzip nodejs npm
+  # opsional: nggak semua distro punya → jangan gagalkan script
+  sudo apt-get install -y zsh-autosuggestions zsh-syntax-highlighting zsh-completions \
+    zoxide direnv bat fd-find eza || true
+elif command -v dnf >/dev/null; then
+  sudo dnf install -y zsh neovim ripgrep fzf gcc make git curl unzip nodejs npm
+  sudo dnf install -y zsh-autosuggestions zsh-syntax-highlighting zoxide direnv bat fd-find eza || true
+elif command -v pacman >/dev/null; then
+  sudo pacman -S --needed --noconfirm zsh neovim ripgrep fzf base-devel git curl unzip nodejs npm
+  sudo pacman -S --needed --noconfirm zsh-autosuggestions zsh-syntax-highlighting zoxide direnv bat fd eza || true
+else
+  echo "!! package manager tak dikenal — install manual: zsh neovim ripgrep fd fzf gcc git node starship zoxide eza"
+fi
+
+# starship nggak ada di apt/dnf/pacman
+command -v starship >/dev/null || curl -fsSL https://starship.rs/install.sh | sh -s -- -y
+
+{{- end }}
+
+# --- login shell → zsh (Linux saja; macOS default-nya sudah zsh) -------------
+# Jangan chsh di macOS: `command -v zsh` bisa nunjuk ke zsh bawaan Homebrew,
+# bukan /bin/zsh, dan chsh-nya minta password.
+if [ "$(uname -s)" = "Linux" ] && command -v zsh >/dev/null 2>&1; then
+  zsh_bin="$(command -v zsh)"
+  if [ "${SHELL:-}" != "$zsh_bin" ]; then
+    grep -qx "$zsh_bin" /etc/shells 2>/dev/null || echo "$zsh_bin" | sudo tee -a /etc/shells >/dev/null
+    chsh -s "$zsh_bin" || echo "!! chsh gagal — jalankan manual: chsh -s $zsh_bin"
+  fi
+fi
+
+# --- tree-sitter CLI (dipakai nvim-treesitter/mason) -------------------------
+command -v tree-sitter >/dev/null 2>&1 || npm i -g tree-sitter-cli || echo "tree-sitter-cli (opsional) gagal"
+
+# --- fallback: neovim repo < 0.9 di Linux (mis. Ubuntu 22.04) ---------------
+if [ "$(uname -s)" = "Linux" ]; then
+  if command -v nvim >/dev/null; then
+    ver="$(nvim --version | head -1 | sed 's/^NVIM v//')"
+  else
+    ver="0"
+  fi
+  maj="${ver%%.*}"
+  min="$(printf '%s' "$ver" | cut -d. -f2)"
+  if [ "$maj" -eq 0 ] && [ "${min:-0}" -lt 9 ]; then
+    arch=x86_64
+    case "$(uname -m)" in aarch64|arm64) arch=arm64 ;; esac
+    tmp="$(mktemp -d)"
+    echo "==> neovim terlalu tua, download tarball ($arch) → ~/.local"
+    curl -fL "https://github.com/neovim/neovim/releases/latest/download/nvim-linux-${arch}.tar.gz" | tar -xz -C "$tmp"
+    mkdir -p "$HOME/.local/bin"
+    cp -R "$tmp/nvim-linux-${arch}/." "$HOME/.local/"
+    rm -rf "$tmp"
+    case ":$PATH:" in
+      *":$HOME/.local/bin:"*) ;;
+      *) echo "!! tambah ke shell rc:  export PATH=\"\$HOME/.local/bin:\$PATH\"" ;;
+    esac
+  fi
+fi
+
+echo "==> paket selesai"

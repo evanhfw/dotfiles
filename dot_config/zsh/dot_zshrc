@@ -1,0 +1,69 @@
+# ~/.config/zsh/.zshrc — managed by chezmoi
+# (dipanggil lewat ZDOTDIR yang di-set di ~/.zshenv)
+
+# --- Homebrew ---------------------------------------------------------------
+if [[ -z ${HOMEBREW_PREFIX:-} ]] || ! command -v brew >/dev/null 2>&1; then
+  for _brew in /opt/homebrew/bin/brew /usr/local/bin/brew /home/linuxbrew/.linuxbrew/bin/brew; do
+    [[ -x $_brew ]] && { eval "$($_brew shellenv)"; break }
+  done
+  unset _brew
+fi
+
+export PATH="$HOME/.local/bin:$PATH"
+
+# --- history ----------------------------------------------------------------
+HISTFILE="${ZDOTDIR:-$HOME}/.zsh_history"
+HISTSIZE=100000
+SAVEHIST=100000
+setopt EXTENDED_HISTORY SHARE_HISTORY HIST_IGNORE_ALL_DUPS HIST_IGNORE_SPACE HIST_REDUCE_BLANKS
+
+# --- completion -------------------------------------------------------------
+for _d in "${HOMEBREW_PREFIX:-/nonexistent}/share/zsh-completions" \
+          /usr/share/zsh-completions /usr/share/zsh/vendor-completions; do
+  [[ -d $_d ]] && fpath=("$_d" $fpath)
+done
+unset _d
+autoload -Uz compinit && compinit -i
+# -i = abaikan direktori "insecure" tanpa nanya. Homebrew sering bikin
+# /opt/homebrew/share jadi group-writable, dan tanpa -i compinit langsung
+# prompt di tengah startup shell lalu abort.
+zstyle ':completion:*' menu select
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
+
+# --- ls/ll → eza ------------------------------------------------------------
+if command -v eza >/dev/null 2>&1; then
+  alias ls='eza --icons --group-directories-first'
+  alias ll='eza -lah --icons --group-directories-first --git'
+  alias la='eza -a  --icons --group-directories-first'
+  alias lt='eza --tree --level=2 --icons'
+fi
+
+# --- tools ------------------------------------------------------------------
+command -v zoxide >/dev/null 2>&1 && eval "$(zoxide init zsh)"
+command -v direnv >/dev/null 2>&1 && eval "$(direnv hook zsh)"
+command -v fzf    >/dev/null 2>&1 && source <(fzf --zsh)
+
+# --- zsh plugins (urutan penting) -------------------------------------------
+source_zsh_plugin() {
+  local f
+  for f in "$@"; do
+    [[ -f $f ]] && { source "$f"; return 0 }
+  done
+  return 1
+}
+
+source_zsh_plugin \
+  "${HOMEBREW_PREFIX:-/nonexistent}/share/zsh-autosuggestions/zsh-autosuggestions.zsh" \
+  /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh \
+  /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+ZSH_AUTOSUGGEST_STRATEGY=(history completion)
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=8'
+
+# HARUS paling akhir di antara plugin zsh
+source_zsh_plugin \
+  "${HOMEBREW_PREFIX:-/nonexistent}/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" \
+  /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh \
+  /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
+# --- prompt (paling akhir) --------------------------------------------------
+command -v starship >/dev/null 2>&1 && eval "$(starship init zsh)"

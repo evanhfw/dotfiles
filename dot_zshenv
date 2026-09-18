@@ -1,0 +1,15 @@
+# ~/.zshenv — dibaca zsh PALING AWAL, untuk SETIAP invocation.
+#
+# Tugasnya cuma satu: kunci ZDOTDIR supaya config selalu ada di
+# $XDG_CONFIG_HOME/zsh, apa pun yang di-set oleh /etc/zshenv, terminal
+# emulator, atau environment warisan dari sesi lama.
+#
+# Tanpa ini, zsh nyari .zshrc di tempat yang salah dan config-mu
+# diam-diam nggak pernah kebaca.
+
+export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
+export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
+export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
+
+export ZDOTDIR="$XDG_CONFIG_HOME/zsh"
