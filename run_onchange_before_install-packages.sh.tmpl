@@ -12,7 +12,7 @@ brew install \
   neovim ripgrep fd fzf lazygit tree-sitter-cli node \
   starship zsh-autosuggestions zsh-syntax-highlighting zsh-completions \
   zoxide eza bat direnv \
-  mise uv tmux sesh herdr
+  mise tmux sesh herdr
 
 {{- else if eq .chezmoi.os "linux" }}
 
@@ -32,10 +32,10 @@ else
   echo "!! package manager tak dikenal — install manual: zsh neovim ripgrep fd fzf tmux gcc git node starship zoxide eza mise uv"
 fi
 
-# starship, mise, uv nggak ada di apt/dnf/pacman
+# starship, mise nggak ada di apt/dnf/pacman
 command -v starship >/dev/null || curl -fsSL https://starship.rs/install.sh | sh -s -- -y
 command -v mise     >/dev/null || curl -fsSL https://mise.run | sh
-command -v uv       >/dev/null || curl -LsSf https://astral.sh/uv/install.sh | sh
+# uv diurus mise (lihat dot_config/mise/config.toml) — jangan pasang dobel
 # herdr & sesh belum ada paket Linux — install manual kalau butuh
 
 {{- end }}
