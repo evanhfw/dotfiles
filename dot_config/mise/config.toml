@@ -15,3 +15,13 @@ node = "24.21.0"
 pnpm = "12.4.2"
 rust = "1.98.1"
 uv   = "0.12.16"
+
+# tree-sitter CLI dipakai nvim-treesitter untuk MENKOMPILASI parser.
+# Dulu dipasang lewat `npm i -g tree-sitter-cli`, tapi paket itu cuma wrapper JS:
+# binary aslinya diunduh oleh postinstall `node install.js`. Kalau postinstall
+# gagal (jaringan/proxy), npm tetap exit 0 → wrapper terpasang tanpa binary →
+# nvim-treesitter crash `spawn .../tree-sitter ENOENT` SETIAP install parser.
+# mise mengunduh binary-nya langsung, jadi tidak ada langkah yang bisa gagal diam-diam.
+tree-sitter = "0.27.0"
+
+# uv diurus mise (lihat komentar di atas) — jangan pasang dobel

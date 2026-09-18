@@ -201,9 +201,30 @@ fi
 # $HOME/.local/bin dijamin ada di PATH karena ditulis di .zshrc.
 npm_pfx="$HOME/.local"
 
-command -v tree-sitter >/dev/null 2>&1 ||
-  npm i -g --prefix "$npm_pfx" tree-sitter-cli ||
-  echo "tree-sitter-cli (opsional) gagal"
+# --- tree-sitter CLI: DIPASANG LEWAT MISE, BUKAN NPM -------------------------
+# tree-sitter = dipakai nvim-treesitter untuk mengompilasi parser.
+#
+# JANGAN pasang lewat npm. Paket `tree-sitter-cli` cuma wrapper JS; binary
+# aslinya diunduh oleh postinstall `node install.js`. Kalau postinstall gagal
+# (jaringan blip / proxy), npm tetap exit 0 sehingga `||` tidak pernah jalan
+# dan tidak ada peringatan. Hasilnya: wrapper terpasang TANPA binary, dan
+# nvim-treesitter crash `spawn .../tree-sitter ENOENT` di SETIAP install parser.
+#
+# mise mengunduh binary rilisnya langsung — satu langkah, tidak bisa gagal diam-diam.
+# Didaftarkan di dot_config/mise/config.toml dan dipasang oleh script
+# run_onchange_after_mise-install.sh.tmpl.
+#
+# Kalau masih ada sisa paket npm yang rusak dari setup lama (wrapper tanpa
+# build/), npm akan mengeluh saat install berikutnya. Bersihkan sekali:
+#   npm uninstall -g --prefix "$HOME/.local" tree-sitter-cli
+# (diagnosa cepat: `tree-sitter --version` gagal dengan error spawn ENOENT)
+if command -v tree-sitter >/dev/null 2>&1; then
+  if ! tree-sitter --version >/dev/null 2>&1; then
+    echo "!! tree-sitter ada di PATH tapi RUSAK (wrapper npm tanpa binary)."
+    echo "   Bersihkan:  npm uninstall -g --prefix \"\$HOME/.local\" tree-sitter-cli"
+    echo "   Lalu:       chezmoi apply   (mise yang akan memasangnya)"
+  fi
+fi
 
 command -v pi >/dev/null 2>&1 ||
   npm i -g --prefix "$npm_pfx" @earendil-works/pi-coding-agent ||
@@ -252,7 +273,7 @@ fi
 
 # --- cek akhir: tool mana yang belum ada ------------------------------------
 missing=""
-for b in zsh nvim git rg fd fzf lazygit node npm starship zoxide eza bat direnv carapace yazi mise uv herdr pi; do
+for b in zsh nvim git rg fd fzf lazygit node npm starship zoxide eza bat direnv carapace yazi mise uv tree-sitter herdr pi; do
   command -v "$b" >/dev/null 2>&1 || missing="$missing $b"
 done
 if [ -n "$missing" ]; then
