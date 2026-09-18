@@ -10,7 +10,10 @@ Chezmoi-managed dotfiles. Target: **macOS**, **Ubuntu 26.04**, **Arch Linux**.
 #    Arch:   sudo pacman -S chezmoi
 #    macOS:  brew install chezmoi
 
-# 2. clone + apply (script install paket ikut jalan)
+# 2. cache password sudo DULU (script install paket butuh root)
+sudo -v
+
+# 3. clone + apply (script install paket ikut jalan)
 chezmoi init --apply git@github.com:evanhfw/dotfiles.git
 ```
 
@@ -23,6 +26,20 @@ chezmoi init --apply git@github.com:evanhfw/dotfiles.git
 
 > Login shell **diubah ke zsh** oleh script install (step 3) kalau belum.
 > Log out / login ulang setelah bootstrap selesai.
+
+### Kalau `sudo` belum ter-cache
+
+Script install **tidak akan hang**. Dia mendeteksi `sudo -n true` gagal, lalu
+melewati semua langkah root dengan pesan jelas — file config tetap ke-apply.
+Setelah `sudo -v`, jalankan `chezmoi apply` lagi untuk memasang paketnya.
+
+### Cek hasil
+
+Di akhir script install ada dua laporan:
+- tool CLI yang belum ada (`BELUM ADA: ...`)
+- plugin zsh (`zsh-autosuggestions`, `zsh-syntax-highlighting`) — kalau hilang,
+autosuggest & pewarnaan syntax **tidak aktif** tanpa pesan error apa pun,
+karena `.zshrc` meng-source-nya secara senyap.
 
 ## Isi
 

@@ -5,11 +5,26 @@
 # 'after' karena config.toml-nya baru ada setelah chezmoi apply.
 set -euo pipefail
 
+# PATH: runner chezmoi tidak mewarisi .zshrc, dan ~/.local/bin belum tentu ada
+# di PATH saat script ini jalan (mise baru dipasang ke situ oleh script
+# 'before'). Tanpa baris ini `command -v mise` gagal → install di-skip diam-diam.
+export PATH="$HOME/.local/bin:$HOME/.config/cargo/bin:$HOME/.local/share/mise/shims:$PATH"
+
 if ! command -v mise >/dev/null; then
-  echo "==> mise belum ada, skip"
+  echo "==> mise belum ada, skip."
+  echo "    Pasang manual: curl https://mise.run | sh  lalu  chezmoi apply"
   exit 0
 fi
 
+# Tanpa HOME yang jelas, mise bisa menulis ke tempat aneh.
+export MISE_DATA_DIR="${MISE_DATA_DIR:-$HOME/.local/share/mise}"
+export MISE_CONFIG_DIR="${MISE_CONFIG_DIR:-$HOME/.config/mise}"
+
 echo "==> mise install (bun, node, pnpm, rust, uv)"
-mise install
+if ! mise install; then
+  echo "!! mise install gagal (cek koneksi)."
+  echo "   Ulangi:  mise install"
+  echo "   (aplikasi config/file lain sudah selesai — ini bukan fatal untuk apply)"
+  exit 0
+fi
 echo "==> mise selesai"

@@ -14,6 +14,17 @@ export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
 # Cargo/rustup dipindah ke XDG (bukan ~/.cargo, ~/.rustup).
 export CARGO_HOME="${CARGO_HOME:-$XDG_CONFIG_HOME/cargo}"
 export RUSTUP_HOME="${RUSTUP_HOME:-$XDG_CONFIG_HOME/rustup}"
+# Go: GOPATH di XDG (bukan ~/go), tapi biner dari `go install` tetap dicari.
+export GOPATH="${GOPATH:-$XDG_DATA_HOME/go}"
+# Docker: config di XDG (bukan ~/.docker).
+export DOCKER_CONFIG="${DOCKER_CONFIG:-$XDG_CONFIG_HOME/docker}"
+# npm: userconfig di XDG; kalau tidak, npm bikin ~/.npmrc di home.
+export NPM_CONFIG_USERCONFIG="${NPM_CONFIG_USERCONFIG:-$XDG_CONFIG_HOME/npm/npmrc}"
+# terminfo: pakai koleksi lokal dulu, lalu jatuh ke sistem.
+# Dipakai `$XDG_DATA_HOME/terminfo:/usr/share/terminfo` supaya entry terminfo
+# custom (mis. dari Nerd Font / tmux) tetap ketemu dan sistem tetap terpakai.
+export TERMINFO="${XDG_DATA_HOME}/terminfo"
+export TERMINFO_DIRS="${XDG_DATA_HOME}/terminfo:/usr/share/terminfo"
 
 # urn: pi & claude baca config dari XDG.
 export PI_CODING_AGENT_DIR="${PI_CODING_AGENT_DIR:-$XDG_CONFIG_HOME/pi/agent}"
