@@ -16,7 +16,12 @@ README.md
 .config/pi/agent/git/**
 .config/pi/agent/auth.json
 .config/pi/agent/models-store.json
+.config/pi/agent/telegram.json
+.config/pi/agent/vision.json
+.config/pi/agent/9router-config.json
+.config/pi/agent/9router.key
 .config/pi/agent/*.log
+.config/pi/agent/*.key
 **/secrets/**
 **/*.age
 session.json

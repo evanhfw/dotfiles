@@ -8,6 +8,24 @@ if ! command -v nvim >/dev/null; then
   exit 0
 fi
 
-echo "==> sync plugin LazyVim (headless, 1-3 menit)"
+# Gate versi WAJIB. LazyVim yang di-pin di lazy-lock.json menolak jalan di
+# nvim < 0.11.2 dan memasang prompt "Press any key to exit" — di `--headless`
+# itu = HANG tanpa timeout, bukan error. Cek dulu, jangan sampai nyangkut.
+nv_ver="$(nvim --version | head -1 | sed 's/^NVIM v//')"
+# Buang suffix non-numerik (mis. "0.12.1-dev+abc" -> 0.12.1) biar aritmetika aman.
+nv_num="$(printf '%s' "$nv_ver" | sed 's/[^0-9.].*$//')"
+nv_maj="${nv_num%%.*}"
+nv_rest="${nv_num#*.}"
+nv_min="${nv_rest%%.*}"
+nv_patch="${nv_rest#*.}"
+if [ "${nv_maj:-0}" -eq 0 ] && { [ "${nv_min:-0}" -lt 11 ] || { [ "${nv_min:-0}" -eq 11 ] && [ "${nv_patch:-0}" -lt 2 ]; }; }; then
+  echo "!! nvim $nv_ver terlalu tua (butuh >= 0.11.2)."
+  echo "   Perbaiki: jalankan ulang 'chezmoi apply --force' (script paket akan"
+  echo "   memasang tarball nvim terbaru ke ~/.local/bin), lalu apply sekali lagi."
+  echo "==> sync plugin DILEWATI (bukan gagal)"
+  exit 0
+fi
+
+echo "==> sync plugin LazyVim (headless, 1-3 menit) — nvim $nv_ver"
 nvim --headless "+Lazy! sync" +qa
 echo "==> plugin selesai"

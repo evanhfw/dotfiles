@@ -164,16 +164,22 @@ command -v pi >/dev/null 2>&1 ||
 
 # --- neovim: pasang/upgrade ke ~/.local (jangan lewat apt) ------------------
 # Kenapa ~/.local: `.local/bin` ada di depan PATH (lihat .zshrc), jadi menang
-# atas /usr/bin/nvim bawaan distro. LazyVim butuh nvim >= 0.10; repo Ubuntu
-# sering masih 0.9.x. Di macOS/Arch ini nggak jalan (brew/pacman sudah baru).
+# atas /usr/bin/nvim bawaan distro. LazyVim (versi yang di-pin di
+# lazy-lock.json) butuh nvim >= 0.11.2; repo Ubuntu sering masih 0.9.x atau
+# 0.10.x. Di macOS/Arch ini nggak jalan (brew/pacman sudah baru).
 if [ "$(uname -s)" = "Linux" ]; then
   nvim_need_install=0
   if command -v nvim >/dev/null; then
     ver="$(nvim --version | head -1 | sed 's/^NVIM v//')"
     maj="${ver%%.*}"
     min="$(printf '%s' "$ver" | cut -d. -f2)"
-    # < 0.10 → terlalu tua buat LazyVim.
-    if [ "${maj:-0}" -eq 0 ] && [ "${min:-0}" -lt 10 ]; then nvim_need_install=1; fi
+    # LazyVim (pinned di lazy-lock.json) butuh >= 0.11.2. Kalau kurang, nvim
+    # nyangkut di prompt "Press any key to exit" dan sync plugin headless HANG.
+    if [ "${maj:-0}" -eq 0 ] && [ "${min:-0}" -lt 11 ]; then nvim_need_install=1; fi
+    if [ "${maj:-0}" -eq 0 ] && [ "${min:-0}" -eq 11 ]; then
+      patch="$(printf '%s' "$ver" | cut -d. -f3)"
+      [ "${patch:-0}" -lt 2 ] && nvim_need_install=1
+    fi
   else
     nvim_need_install=1
   fi
@@ -181,13 +187,17 @@ if [ "$(uname -s)" = "Linux" ]; then
     nv_arch=x86_64
     case "$(uname -m)" in aarch64|arm64) nv_arch=arm64 ;; esac
     nv_tmp="$(mktemp -d)"
+    # v0.12.x masih pakai nama "nvim-linux-<arch>"; rilis lama pakai "nvim-linux64".
+    # Coba yang baru dulu, fallback ke nama lama kalau 404.
+    nv_url="https://github.com/neovim/neovim/releases/latest/download/nvim-linux-${nv_arch}.tar.gz"
+    nv_dir="nvim-linux-${nv_arch}"
     echo "==> neovim: unduh tarball terbaru ($nv_arch) → ~/.local"
-    if curl -fL "https://github.com/neovim/neovim/releases/latest/download/nvim-linux-${nv_arch}.tar.gz" | tar -xz -C "$nv_tmp"; then
+    if curl -fL "$nv_url" | tar -xz -C "$nv_tmp" 2>/dev/null; then
       mkdir -p "$HOME/.local/bin"
-      cp -R "$nv_tmp/nvim-linux-${nv_arch}/." "$HOME/.local/"
+      cp -R "$nv_tmp/$nv_dir/." "$HOME/.local/"
       echo "==> neovim $("$HOME/.local/bin/nvim" --version | head -1)"
     else
-      echo "!! neovim gagal diunduh"
+      echo "!! neovim gagal diunduh dari $nv_url"
     fi
     rm -rf "$nv_tmp"
   fi
