@@ -11,6 +11,12 @@ fi
 
 export PATH="$HOME/.local/bin:$PATH"
 
+# --- editor -----------------------------------------------------------------
+# Wajib: yazi (dan git, lazygit) ambil opening-nya dari $EDITOR. Kalau unset,
+# yazi jatuh ke `vi` — makanya Enter buka vim, bukan nvim.
+export EDITOR=nvim
+export VISUAL=nvim
+
 # --- history ----------------------------------------------------------------
 HISTFILE="${ZDOTDIR:-$HOME}/.zsh_history"
 HISTSIZE=100000

@@ -1,0 +1,17 @@
+# ~/.config/yazi/yazi.toml — managed by chezmoi
+#
+# File ini cuma OVERRIDE. Key yang nggak ditulis di sini tetap pakai default yazi.
+
+[manager]
+# "size" = tampilkan ukuran, dan untuk direktori tampilkan JUMLAH FILE di dalamnya.
+# Ini fitur dari https://github.com/sxyazi/yazi/pull/1591 (merged Sep 2024).
+# Default yazi = "none", jadi harus dinyalakan manual.
+# Jumlah file dihitung saat direktori benar-benar dibuka, jadi nggak bikin lemot.
+linemode = "size"
+
+[opener]
+# Eksplisit nvim, nggak bergantung $EDITOR. Default yazi pakai
+# `${EDITOR:-vi}` — kalau $EDITOR kosong, `Enter` di file teks buka vim.
+edit = [
+	{ run = "nvim %s", desc = "nvim", for = "unix", block = true },
+]
