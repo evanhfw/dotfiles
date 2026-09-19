@@ -1,0 +1,7 @@
+# Ghostty derives the macos-option-as-alt default from the active layout, but
+# its mapAppleId list only knows "com.apple.keylayout.US" and
+# "com.apple.keylayout.USInternational". The newer "ABC" layout
+# (com.apple.keylayout.ABC) maps to unknown -> Option is NOT Alt, so
+# Option+arrow is translated to the macOS word-jump escapes and never reaches
+# the TUI as alt+left / alt+right (herdr tab switching, ctrl+alt+hjkl panes).
+macos-option-as-alt = true
