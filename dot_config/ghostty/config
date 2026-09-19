@@ -5,3 +5,14 @@
 # Option+arrow is translated to the macOS word-jump escapes and never reaches
 # the TUI as alt+left / alt+right (herdr tab switching, ctrl+alt+hjkl panes).
 macos-option-as-alt = true
+
+# Ghostty also ships default keybinds that rewrite Option+arrows to the
+# macOS word-jump sequences (ESC b / ESC f) before any TUI sees them:
+#
+#   keybind = alt+arrow_left=esc:b
+#   keybind = alt+arrow_right=esc:f
+#
+# Unbind them so Option+Left/Right is encoded as a real modified arrow
+# (CSI 1;3D / CSI 1;3C) and reaches herdr for previous_tab / next_tab.
+keybind = alt+arrow_left=unbind
+keybind = alt+arrow_right=unbind

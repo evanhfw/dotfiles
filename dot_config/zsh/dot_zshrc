@@ -72,6 +72,11 @@ if [[ -o interactive ]]; then
   bindkey '^[[B' down-line-or-beginning-search  # Down
   bindkey '^[OA' up-line-or-beginning-search    # Up (mode application)
   bindkey '^[OB' down-line-or-beginning-search  # Down (mode application)
+  # Ghostty's default alt+arrow word-jump bind is unbound (see ghostty config)
+  # so herdr can use alt+left/right for tabs; wire the real sequence back up
+  # here so word movement still works in plain shells and nested ssh.
+  bindkey '^[[1;3D' backward-word               # Alt+Left
+  bindkey '^[[1;3C' forward-word                # Alt+Right
 fi
 
 # --- ls/ll → eza ------------------------------------------------------------
