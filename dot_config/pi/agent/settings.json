@@ -10,7 +10,7 @@
     "npm:@getpipher/vision"
   ],
   "defaultProvider": "omni",
-  "defaultModel": "cmd/deepseek/deepseek-v4.1-flash",
+  "defaultModel": "cmd/deepseek/deepseek-v4.1-flash-max",
   "defaultThinkingLevel": "high",
   "hideThinkingBlock": true
 }
