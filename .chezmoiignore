@@ -29,6 +29,15 @@ plugins.json
 *.log
 
 # --- Scope per-OS ------------------------------------------------------------
+{{ if not (and (eq .chezmoi.os "linux") (or (eq .chezmoi.osRelease.id "arch") (contains "arch" .chezmoi.osRelease.idLike))) }}
+# Hyprland/Omarchy hanya untuk Arch (Omarchy).
+.config/hypr/**
+.config/omarchy/**
+{{ end }}
+
+# Digenerate plugin hyprmoncfg; jangan pernah ditimpa chezmoi.
+.config/hypr/hyprmoncfg-monitors.lua
+
 {{ if eq .chezmoi.os "windows" }}
 # Windows: cuma VSCodium yang relevan.
 .config/**

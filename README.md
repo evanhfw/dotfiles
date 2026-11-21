@@ -49,8 +49,30 @@ karena `.zshrc` meng-source-nya secara senyap.
 | `dot_config/nvim/` | LazyVim + extras (yanky, docker, git, go, json, markdown, python, toml, yaml), colorscheme **aether**, basedpyright+ruff, treesitter-context |
 | `dot_config/mise/` | versi pinned: bun, node (LTS), pnpm, rust, uv |
 | `dot_config/herdr/` | multiplexer: prefix `ctrl+space`, pane nav `ctrl+alt+hjkl` + arrows |
+| `dot_config/hypr/` | Hyprland (Omarchy): bindings, input, looknfeel, autostart, monitor |
+| `dot_config/omarchy/` | Omarchy shell (`shell.json`), deadzone guard, default agent, theme hook |
 | `dot_config/yazi/` | file manager: `linemode=size`, opener nvim, keymap |
 | `dot_config/pi/` | pi coding agent: provider + packages |
+
+### Omarchy plugins (tidak di-vendor)
+
+Plugin di `~/.config/omarchy/plugins/` adalah clone git masing-masing, bukan
+config. Pasang ulang manual:
+
+```bash
+omarchy plugin add crmne/omarchy-hyprmoncfg --enable
+omarchy plugin add crmne/omastats --enable
+omarchy plugin add typecraft-dev/oma-cast --enable
+omarchy plugin add gfhdhytghd/HyprCapture --enable
+omarchy plugin add SirJul1337/omarchy-lock-explorer --enable
+omarchy plugin add fross100/omaplug --enable
+```
+
+`evan.deadzone` dan `evan.football` masih lokal/remote pribadi.
+
+File yang **digenerate** dan sengaja tidak dikelola chezmoi:
+`~/.config/hypr/hyprmoncfg-monitors.lua` (hyprmoncfg) dan blok plugin di
+`~/.config/omarchy/extensions/omarchy-menu.jsonc`.
 
 ## Struktur penting
 
