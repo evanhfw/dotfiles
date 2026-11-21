@@ -48,7 +48,7 @@ karena `.zshrc` meng-source-nya secara senyap.
 | `dot_zshenv` + `dot_config/zsh/` | zsh: XDG, history, completion (carapace), eza/bat, mise, zoxide, fzf, yazi, direnv, starship. **Tanpa oh-my-zsh.** |
 | `dot_config/nvim/` | LazyVim + extras (yanky, docker, git, go, json, markdown, python, toml, yaml), colorscheme **aether**, basedpyright+ruff, treesitter-context |
 | `dot_config/mise/` | versi pinned: bun, node (LTS), pnpm, rust, uv |
-| `dot_config/herdr/` | multiplexer: prefix `ctrl+space`, pane nav `ctrl+alt+hjkl` + arrows |
+| `dot_config/herdr/` | multiplexer: prefix `ctrl+space`, pane nav `ctrl+alt+hjkl` + arrows; plugin `vim-herdr-navigation` dipasang `run_onchange_after_herdr-plugins.sh` (dipin ke commit) |
 | `dot_config/hypr/` | Hyprland (Omarchy): bindings, input, looknfeel, autostart, monitor |
 | `dot_config/omarchy/` | Omarchy shell (`shell.json`), deadzone guard, default agent, theme hook |
 | `dot_config/yazi/` | file manager: `linemode=size`, opener nvim, keymap |
